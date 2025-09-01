@@ -1,6 +1,6 @@
 package com.bezina.water_delivery.order_service.entity;
 
-import com.bezina.water_delivery.order_service.entity.enums.OrderStatus;
+import com.bezina.water_delivery.core.model.OrderStatus;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;

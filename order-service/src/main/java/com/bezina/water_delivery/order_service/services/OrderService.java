@@ -7,8 +7,7 @@ import com.bezina.water_delivery.order_service.DAO.OrderStatusHistoryRepository;
 import com.bezina.water_delivery.order_service.entity.Order;
 import com.bezina.water_delivery.order_service.entity.OrderItem;
 import com.bezina.water_delivery.order_service.entity.OrderStatusHistory;
-import com.bezina.water_delivery.order_service.entity.enums.OrderStatus;
-import org.springframework.kafka.annotation.KafkaListener;
+import com.bezina.water_delivery.core.model.OrderStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
