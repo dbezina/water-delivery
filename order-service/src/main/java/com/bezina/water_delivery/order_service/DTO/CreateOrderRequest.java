@@ -6,25 +6,17 @@ import java.util.List;
 import java.util.Objects;
 
 public class CreateOrderRequest {
-    private String userId;
+  //  private String userId;
     private String address;
     private List<OrderItemDto> items;
 
-    public CreateOrderRequest(String userId, String address, List<OrderItemDto> items) {
-        this.userId = userId;
+    public CreateOrderRequest( String address, List<OrderItemDto> items) {
+      //  this.userId = userId;
         this.address = address;
         this.items = items;
     }
 
     public CreateOrderRequest() {
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
     }
 
     public String getAddress() {
@@ -48,18 +40,17 @@ public class CreateOrderRequest {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CreateOrderRequest that = (CreateOrderRequest) o;
-        return Objects.equals(userId, that.userId) && Objects.equals(address, that.address) && Objects.equals(items, that.items);
+        return Objects.equals(address, that.address) && Objects.equals(items, that.items);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(userId, address, items);
+        return Objects.hash(address, items);
     }
 
     @Override
     public String toString() {
         return "CreateOrderRequest{" +
-                "userId='" + userId + '\'' +
                 ", address='" + address + '\'' +
                 ", items=" + items +
                 '}';

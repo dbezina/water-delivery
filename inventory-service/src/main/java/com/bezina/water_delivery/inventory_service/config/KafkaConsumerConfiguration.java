@@ -1,4 +1,4 @@
-package com.bezina.water_delivery.inventory_service;
+package com.bezina.water_delivery.inventory_service.config;
 
 
 

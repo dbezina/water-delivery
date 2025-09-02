@@ -1,13 +1,14 @@
 package com.bezina.water_delivery.order_service.services;
 
 import com.bezina.water_delivery.core.DTO.OrderItemDto;
+import com.bezina.water_delivery.core.model.OrderItem;
+import com.bezina.water_delivery.core.model.OrderStatusHistory;
+
+
+import com.bezina.water_delivery.core.model.Order;
+import com.bezina.water_delivery.core.model.OrderStatus;
 import com.bezina.water_delivery.order_service.DAO.OrderRepository;
 import com.bezina.water_delivery.order_service.DAO.OrderStatusHistoryRepository;
-
-import com.bezina.water_delivery.order_service.entity.Order;
-import com.bezina.water_delivery.order_service.entity.OrderItem;
-import com.bezina.water_delivery.order_service.entity.OrderStatusHistory;
-import com.bezina.water_delivery.core.model.OrderStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -82,4 +83,7 @@ public class OrderService {
     }
 
 
+    public void updateStatusFromCourier(String orderId, OrderStatus status) {
+        Order order =  updateStatus(orderId, status);
+    }
 }

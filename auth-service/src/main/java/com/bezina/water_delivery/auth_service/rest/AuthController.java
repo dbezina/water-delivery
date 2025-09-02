@@ -12,15 +12,12 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
 @RequestMapping("/auth")
+@CrossOrigin(origins = "*") // или конкретный фронтенд URL
 public class AuthController {
 
     private final UserRepository userRepository;
@@ -28,6 +25,8 @@ public class AuthController {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final CustomUserDetailsService userDetailsService;
+
+
 
     public AuthController(UserRepository userRepository,
                           PasswordEncoder passwordEncoder,
@@ -38,6 +37,11 @@ public class AuthController {
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
+    }
+
+    @GetMapping("/hello")
+    public ResponseEntity<String> test() {
+        return ResponseEntity.ok("hello successfully");
     }
 
     @PostMapping("/register")

@@ -8,6 +8,7 @@ import com.bezina.water_delivery.delivery_service.entity.enums.AssignmentStatus;
 import com.bezina.water_delivery.delivery_service.events.DeliveryAssignedEvent;
 import com.bezina.water_delivery.delivery_service.events.DeliveryStatusChangedEvent;
 import com.bezina.water_delivery.delivery_service.kafka.DeliveryEventProducer;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
@@ -15,6 +16,7 @@ import java.time.temporal.ChronoUnit;
 
 @RestController
 @RequestMapping("/admin/delivery")
+@PreAuthorize("hasRole('ADMIN')")
 public class DeliveryController {
 
     private final AssignmentRepository assignmentRepository;

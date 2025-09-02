@@ -1,7 +1,7 @@
-package com.bezina.water_delivery.order_service.entity;
+package com.bezina.water_delivery.core.model;
+
 
 import jakarta.persistence.*;
-
 
 @Entity
 @Table(name = "order_items")

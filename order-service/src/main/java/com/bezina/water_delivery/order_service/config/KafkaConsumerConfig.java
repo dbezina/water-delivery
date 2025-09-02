@@ -1,4 +1,4 @@
-package com.bezina.water_delivery.order_service;
+package com.bezina.water_delivery.order_service.config;
 
 
 import com.bezina.water_delivery.core.events.DeliveryStatusChangedEvent;

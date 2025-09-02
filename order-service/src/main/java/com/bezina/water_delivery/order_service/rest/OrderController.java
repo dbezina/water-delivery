@@ -1,16 +1,15 @@
 package com.bezina.water_delivery.order_service.rest;
 
 import com.bezina.water_delivery.core.DTO.OrderItemDto;
+import com.bezina.water_delivery.core.events.OrderCreatedEvent;
+import com.bezina.water_delivery.core.model.Order;
+
+import com.bezina.water_delivery.order_service.DAO.OrderRepository;
 import com.bezina.water_delivery.order_service.DAO.OrderStatusHistoryRepository;
 import com.bezina.water_delivery.order_service.DTO.CreateOrderRequest;
-
-import com.bezina.water_delivery.core.events.OrderCreatedEvent;
-
-
-import com.bezina.water_delivery.order_service.entity.Order;
-import com.bezina.water_delivery.order_service.DAO.OrderRepository;
 import com.bezina.water_delivery.order_service.kafka.OrderEventProducer;
 import com.bezina.water_delivery.order_service.services.OrderService;
+
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +17,7 @@ import java.time.Instant;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/orders")
+@RequestMapping("/user/orders")
 public class OrderController {
 
     private final OrderRepository orderRepository;
@@ -35,9 +34,11 @@ public class OrderController {
     }
 
    @PostMapping
-   public String createOrder(@Valid @RequestBody CreateOrderRequest request) {
+   public String createOrder(@Valid @RequestBody CreateOrderRequest request,
+                             @RequestHeader("X-User-Id") String userId,
+                             @RequestHeader("X-User-Role") String role) {
        // save order
-       Order saved =  orderService.createOrder(request.getUserId(),request.getAddress(),request.getItems() );
+       Order saved =  orderService.createOrder(userId,request.getAddress(),request.getItems() );
 
        // create event
        OrderCreatedEvent event = new OrderCreatedEvent(

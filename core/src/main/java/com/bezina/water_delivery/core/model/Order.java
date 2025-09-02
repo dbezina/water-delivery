@@ -1,8 +1,9 @@
-package com.bezina.water_delivery.order_service.entity;
+package com.bezina.water_delivery.core.model;
 
 import com.bezina.water_delivery.core.model.OrderStatus;
 import jakarta.persistence.*;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,17 +23,21 @@ public class Order {
     @Column(nullable = false)
     private OrderStatus status = OrderStatus.PENDING; // по умолчанию
 
+    @Column
+    private Instant createdAt;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items;
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderStatusHistory> statusHistory = new ArrayList<>();
 
-    public Order(String id, String userId, String address, List<OrderItem> items, List<OrderStatusHistory> statusHistory ) {
+    public Order(String id, String userId, String address, List<OrderItem> items, List<OrderStatusHistory> statusHistory, Instant createdAt ) {
         this.id = id;
         this.userId = userId;
         this.address = address;
         this.items = items;
         this.statusHistory = statusHistory;
+        this.createdAt = createdAt;
     }
 
     public Order() {
@@ -84,5 +89,13 @@ public class Order {
 
     public void setStatusHistory(List<OrderStatusHistory> statusHistory) {
         this.statusHistory = statusHistory;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
     }
 }

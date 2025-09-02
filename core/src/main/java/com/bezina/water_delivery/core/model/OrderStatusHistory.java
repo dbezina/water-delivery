@@ -1,6 +1,5 @@
-package com.bezina.water_delivery.order_service.entity;
+package com.bezina.water_delivery.core.model;
 
-import com.bezina.water_delivery.core.model.OrderStatus;
 import jakarta.persistence.*;
 
 import java.time.Instant;
