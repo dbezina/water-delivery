@@ -12,6 +12,7 @@
         <module name="inventory-service" />
         <module name="order-service" />
         <module name="gateway" />
+        <module name="mock-payment-service" />
       </profile>
     </annotationProcessing>
   </component>
@@ -22,6 +23,7 @@
       <module name="delivery-service" options="-parameters" />
       <module name="gateway" options="-parameters" />
       <module name="inventory-service" options="-parameters" />
+      <module name="mock-payment-service" options="-parameters" />
       <module name="order-service" options="-parameters" />
     </option>
   </component>

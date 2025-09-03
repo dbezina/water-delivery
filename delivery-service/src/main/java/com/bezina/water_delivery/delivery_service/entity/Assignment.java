@@ -14,7 +14,7 @@ public class Assignment {
     private String id;
 
     @Column(nullable = false)
-    private String orderId;
+    private Long orderNo;
 
     private String courierId; // может быть NULL при автопланировании
 
@@ -22,8 +22,8 @@ public class Assignment {
     @Column(nullable = false)
     private AssignmentStatus status;
 
-    private Instant etaFrom;
-    private Instant etaTo;
+    private Instant deliverFrom;
+    private Instant deliverTo;
 
     private Instant createdAt;
     private Instant updatedAt;
@@ -40,19 +40,19 @@ public class Assignment {
     }
 
     public Assignment(String id,
-                      String orderId,
+                      Long orderNo,
                       String courierId,
                       AssignmentStatus status,
-                      Instant etaFrom,
-                      Instant etaTo,
+                      Instant deliverFrom,
+                      Instant deliverTo,
                       Instant createdAt,
                       Instant updatedAt) {
         this.id = id;
-        this.orderId = orderId;
+        this.orderNo = orderNo;
         this.courierId = courierId;
         this.status = status;
-        this.etaFrom = etaFrom;
-        this.etaTo = etaTo;
+        this.deliverFrom = deliverFrom;
+        this.deliverTo = deliverTo;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -68,12 +68,12 @@ public class Assignment {
         this.id = id;
     }
 
-    public String getOrderId() {
-        return orderId;
+    public Long getOrderNo() {
+        return orderNo;
     }
 
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
+    public void setOrderNo(Long orderNo) {
+        this.orderNo = orderNo;
     }
 
     public String getCourierId() {
@@ -92,20 +92,20 @@ public class Assignment {
         this.status = status;
     }
 
-    public Instant getEtaFrom() {
-        return etaFrom;
+    public Instant getDeliverFrom() {
+        return deliverFrom;
     }
 
-    public void setEtaFrom(Instant etaFrom) {
-        this.etaFrom = etaFrom;
+    public void setDeliverFrom(Instant deliverFrom) {
+        this.deliverFrom = deliverFrom;
     }
 
-    public Instant getEtaTo() {
-        return etaTo;
+    public Instant getDeliverTo() {
+        return deliverTo;
     }
 
-    public void setEtaTo(Instant etaTo) {
-        this.etaTo = etaTo;
+    public void setDeliverTo(Instant deliverTo) {
+        this.deliverTo = deliverTo;
     }
 
     public Instant getCreatedAt() {
@@ -129,23 +129,23 @@ public class Assignment {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Assignment that = (Assignment) o;
-        return Objects.equals(id, that.id) && Objects.equals(orderId, that.orderId) && Objects.equals(courierId, that.courierId) && status == that.status && Objects.equals(etaFrom, that.etaFrom) && Objects.equals(etaTo, that.etaTo) && Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt);
+        return Objects.equals(id, that.id) && Objects.equals(orderNo, that.orderNo) && Objects.equals(courierId, that.courierId) && status == that.status && Objects.equals(deliverFrom, that.deliverFrom) && Objects.equals(deliverTo, that.deliverTo) && Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, orderId, courierId, status, etaFrom, etaTo, createdAt, updatedAt);
+        return Objects.hash(id, orderNo, courierId, status, deliverFrom, deliverTo, createdAt, updatedAt);
     }
 
     @Override
     public String toString() {
         return "Assignment{" +
                 "id='" + id + '\'' +
-                ", orderId='" + orderId + '\'' +
+                ", orderId='" + orderNo + '\'' +
                 ", courierId='" + courierId + '\'' +
                 ", status=" + status +
-                ", etaFrom=" + etaFrom +
-                ", etaTo=" + etaTo +
+                ", etaFrom=" + deliverFrom +
+                ", etaTo=" + deliverTo +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';

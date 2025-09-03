@@ -5,12 +5,12 @@ import com.bezina.water_delivery.delivery_service.entity.enums.AssignmentStatus;
 import java.util.Objects;
 
 public class DeliveryStatusChangedEvent {
-    private String orderId;
+    private Long orderNo;
     private AssignmentStatus status;
     private long createdAt;
 
-    public DeliveryStatusChangedEvent(String orderId, AssignmentStatus status, long createdAt) {
-        this.orderId = orderId;
+    public DeliveryStatusChangedEvent(Long orderNo, AssignmentStatus status, long createdAt) {
+        this.orderNo = orderNo;
         this.status = status;
         this.createdAt = createdAt;
     }
@@ -18,12 +18,12 @@ public class DeliveryStatusChangedEvent {
     public DeliveryStatusChangedEvent() {
     }
 
-    public String getOrderId() {
-        return orderId;
+    public Long getOrderNo() {
+        return orderNo;
     }
 
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
+    public void setOrderNo(Long orderNo) {
+        this.orderNo = orderNo;
     }
 
     public AssignmentStatus getStatus() {
@@ -47,18 +47,18 @@ public class DeliveryStatusChangedEvent {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DeliveryStatusChangedEvent that = (DeliveryStatusChangedEvent) o;
-        return createdAt == that.createdAt && Objects.equals(orderId, that.orderId) && status == that.status;
+        return createdAt == that.createdAt && Objects.equals(orderNo, that.orderNo) && status == that.status;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(orderId, status, createdAt);
+        return Objects.hash(orderNo, status, createdAt);
     }
 
     @Override
     public String toString() {
         return "DeliveryStatusChangedEvent{" +
-                "orderId='" + orderId + '\'' +
+                "orderId='" + orderNo + '\'' +
                 ", status=" + status +
                 ", createdAt=" + createdAt +
                 '}';

@@ -5,12 +5,12 @@ import com.bezina.water_delivery.core.model.OrderStatus;
 import java.util.Objects;
 
 public class DeliveryStatusChangedEvent {
-    private String orderId;
+    private Long orderNo;
     private OrderStatus status; // PENDING, CONFIRMED, IN_ROUTE, DELIVERED, CANCELLED
     private long changedAt;
 
-    public DeliveryStatusChangedEvent(String orderId, OrderStatus status, long changedAt) {
-        this.orderId = orderId;
+    public DeliveryStatusChangedEvent(Long orderNo, OrderStatus status, long changedAt) {
+        this.orderNo = orderNo;
         this.status = status;
         this.changedAt = changedAt;
     }
@@ -18,12 +18,12 @@ public class DeliveryStatusChangedEvent {
     public DeliveryStatusChangedEvent() {
     }
 
-    public String getOrderId() {
-        return orderId;
+    public Long getOrderNo() {
+        return orderNo;
     }
 
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
+    public void setOrderNo(Long orderNo) {
+        this.orderNo = orderNo;
     }
 
     public OrderStatus getStatus() {
@@ -47,18 +47,18 @@ public class DeliveryStatusChangedEvent {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DeliveryStatusChangedEvent that = (DeliveryStatusChangedEvent) o;
-        return changedAt == that.changedAt && Objects.equals(orderId, that.orderId) && status == that.status;
+        return changedAt == that.changedAt && Objects.equals(orderNo, that.orderNo) && status == that.status;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(orderId, status, changedAt);
+        return Objects.hash(orderNo, status, changedAt);
     }
 
     @Override
     public String toString() {
         return "DeliveryStatusChangedEvent{" +
-                "orderId='" + orderId + '\'' +
+                "orderId='" + orderNo + '\'' +
                 ", status=" + status +
                 ", changedAt=" + changedAt +
                 '}';

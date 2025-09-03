@@ -2,6 +2,7 @@ package com.bezina.water_delivery.core.model;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 
 @Entity
 @Table(name = "order_items")
@@ -14,6 +15,7 @@ public class OrderItem {
     private String size;   // "1L", "5L", "18L"
 
     @Column(nullable = false)
+    @Min(value = 1)
     private int quantity;
 
     @ManyToOne(fetch = FetchType.LAZY)

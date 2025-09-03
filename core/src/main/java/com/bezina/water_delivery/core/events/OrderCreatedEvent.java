@@ -9,6 +9,7 @@ import java.util.Objects;
 
     public class OrderCreatedEvent {
         private String orderId;
+        private Long orderNo;
         private String userId;
         private List<OrderItemDto> items;
         private String address;
@@ -18,76 +19,86 @@ import java.util.Objects;
         public OrderCreatedEvent() {
     }
 
-    public OrderCreatedEvent(String orderId, String userId, List<OrderItemDto> items, String address, Long createdAt) {
-        this.orderId = orderId;
-        this.userId = userId;
-        this.items = items;
-        this.address = address;
-        this.createdAt = createdAt;
-    }
+        public OrderCreatedEvent(String orderId, Long orderNo, String userId, List<OrderItemDto> items, String address, long createdAt) {
+            this.orderId = orderId;
+            this.orderNo = orderNo;
+            this.userId = userId;
+            this.items = items;
+            this.address = address;
+            this.createdAt = createdAt;
+        }
 
-    public String getOrderId() {
-        return orderId;
-    }
+        public String getOrderId() {
+            return orderId;
+        }
 
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
-    }
+        public void setOrderId(String orderId) {
+            this.orderId = orderId;
+        }
 
-    public String getUserId() {
-        return userId;
-    }
+        public Long getOrderNo() {
+            return orderNo;
+        }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
+        public void setOrderNo(Long orderNo) {
+            this.orderNo = orderNo;
+        }
 
-    public List<OrderItemDto> getItems() {
-        return items;
-    }
+        public String getUserId() {
+            return userId;
+        }
 
-    public void setItems(List<OrderItemDto> items) {
-        this.items = items;
-    }
+        public void setUserId(String userId) {
+            this.userId = userId;
+        }
 
-    public String getAddress() {
-        return address;
-    }
+        public List<OrderItemDto> getItems() {
+            return items;
+        }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
+        public void setItems(List<OrderItemDto> items) {
+            this.items = items;
+        }
 
-    public Long getCreatedAt() {
-        return createdAt;
-    }
+        public String getAddress() {
+            return address;
+        }
 
-    public void setCreatedAt(Long createdAt) {
-        this.createdAt = createdAt;
-    }
+        public void setAddress(String address) {
+            this.address = address;
+        }
 
-    @Override
-    public String toString() {
-        return "OrderCreatedEvent{" +
-                "orderId='" + orderId + '\'' +
-                ", userId='" + userId + '\'' +
-                ", items=" + items +
-                ", address='" + address + '\'' +
-                ", createdAt=" + createdAt +
-                '}';
-    }
+        public long getCreatedAt() {
+            return createdAt;
+        }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        OrderCreatedEvent that = (OrderCreatedEvent) o;
-        return Objects.equals(orderId, that.orderId) && Objects.equals(userId, that.userId) && Objects.equals(items, that.items) && Objects.equals(address, that.address) && Objects.equals(createdAt, that.createdAt);
-    }
+        public void setCreatedAt(long createdAt) {
+            this.createdAt = createdAt;
+        }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(orderId, userId, items, address, createdAt);
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            OrderCreatedEvent that = (OrderCreatedEvent) o;
+            return createdAt == that.createdAt && Objects.equals(orderId, that.orderId) && Objects.equals(orderNo, that.orderNo) && Objects.equals(userId, that.userId) && Objects.equals(items, that.items) && Objects.equals(address, that.address);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(orderId, orderNo, userId, items, address, createdAt);
+        }
+
+        @Override
+        public String toString() {
+            return "OrderCreatedEvent{" +
+                    "orderId='" + orderId + '\'' +
+                    ", orderNo=" + orderNo +
+                    ", userId='" + userId + '\'' +
+                    ", items=" + items +
+                    ", address='" + address + '\'' +
+                    ", createdAt=" + createdAt +
+                    '}';
+        }
     }
-}
 

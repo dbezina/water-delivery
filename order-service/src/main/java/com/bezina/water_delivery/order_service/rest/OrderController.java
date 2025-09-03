@@ -8,6 +8,7 @@ import com.bezina.water_delivery.order_service.DAO.OrderRepository;
 import com.bezina.water_delivery.order_service.DAO.OrderStatusHistoryRepository;
 import com.bezina.water_delivery.order_service.DTO.CreateOrderRequest;
 import com.bezina.water_delivery.order_service.kafka.OrderEventProducer;
+import com.bezina.water_delivery.order_service.services.OrderNoGenerator;
 import com.bezina.water_delivery.order_service.services.OrderService;
 
 import jakarta.validation.Valid;
@@ -23,13 +24,15 @@ public class OrderController {
     private final OrderRepository orderRepository;
     private final OrderStatusHistoryRepository historyRepository;
     private final OrderEventProducer eventProducer;
+    private final OrderNoGenerator orderNoGenerator;
     private OrderService orderService;
 
-    public OrderController(OrderRepository orderRepository, OrderStatusHistoryRepository historyRepository, OrderEventProducer eventProducer) {
+    public OrderController(OrderRepository orderRepository, OrderStatusHistoryRepository historyRepository, OrderEventProducer eventProducer, OrderNoGenerator orderNoGenerator) {
         this.orderRepository = orderRepository;
         this.historyRepository = historyRepository;
         this.eventProducer = eventProducer;
-        orderService = new OrderService(orderRepository, historyRepository);
+        this.orderNoGenerator = orderNoGenerator;
+        orderService = new OrderService(orderRepository, historyRepository, this.orderNoGenerator);
 
     }
 
@@ -43,6 +46,7 @@ public class OrderController {
        // create event
        OrderCreatedEvent event = new OrderCreatedEvent(
                saved.getId(),
+               saved.getOrderNo(),
                saved.getUserId(),
                saved.getItems().stream()
                        .map(i -> new OrderItemDto(i.getSize(), i.getQuantity()))

@@ -31,6 +31,10 @@ public class OrderStatusHistory {
     public OrderStatusHistory() {
     }
 
+    @PrePersist
+    public void onCreate() {
+        changedAt = Instant.now();
+    }
     public Long getId() {
         return id;
     }

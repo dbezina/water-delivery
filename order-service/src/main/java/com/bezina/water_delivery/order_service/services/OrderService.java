@@ -21,11 +21,13 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderStatusHistoryRepository historyRepository;
+    private final OrderNoGenerator orderNoGenerator;
 
     public OrderService(OrderRepository orderRepository,
-                        OrderStatusHistoryRepository historyRepository) {
+                        OrderStatusHistoryRepository historyRepository, OrderNoGenerator orderNoGenerator) {
         this.orderRepository = orderRepository;
         this.historyRepository = historyRepository;
+        this.orderNoGenerator = orderNoGenerator;
     }
 
     /**
@@ -34,6 +36,10 @@ public class OrderService {
 
     public Order createOrder(String userId, String address, List<OrderItemDto> itemsDto) {
         Order order = new Order();
+
+        if (order.getOrderNo() == null) {
+            order.setOrderNo(orderNoGenerator.nextOrderNo());
+        }
         order.setUserId(userId);
         order.setAddress(address);
         order.setStatus(OrderStatus.PENDING);

@@ -51,7 +51,7 @@ public class DeliveryEventListener {
     public void handleDeliveryStatusChanged(DeliveryStatusChangedEvent event) {
         System.out.println("📦 Delivery status update: " + event);
 
-        orderRepository.findById(event.getOrderId()).ifPresent(order -> {
+        orderRepository.findByOrderNo(event.getOrderNo()).ifPresent(order -> {
             order.setStatus(event.getStatus());
             orderRepository.save(order);
 

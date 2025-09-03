@@ -6,23 +6,18 @@ import java.time.Instant;
 import java.util.Objects;
 
 public class DeliveryAssignedEvent {
-    private String orderId;
+    private Long orderNo;
     private String courierId;
-    private Instant etaFrom;
-    private Instant etaTo;
+    private Instant deliverFrom;
+    private Instant deliverTo;
     private AssignmentStatus status;
     private long createdAt;
 
-    public DeliveryAssignedEvent(String orderId,
-                                 String courierId,
-                                 Instant etaFrom,
-                                 Instant etaTo,
-                                 AssignmentStatus status,
-                                 long createdAt) {
-        this.orderId = orderId;
+    public DeliveryAssignedEvent(Long orderNo, String courierId, Instant deliverFrom, Instant deliverTo, AssignmentStatus status, long createdAt) {
+        this.orderNo = orderNo;
         this.courierId = courierId;
-        this.etaFrom = etaFrom;
-        this.etaTo = etaTo;
+        this.deliverFrom = deliverFrom;
+        this.deliverTo = deliverTo;
         this.status = status;
         this.createdAt = createdAt;
     }
@@ -30,12 +25,12 @@ public class DeliveryAssignedEvent {
     public DeliveryAssignedEvent() {
     }
 
-    public String getOrderId() {
-        return orderId;
+    public Long getOrderNo() {
+        return orderNo;
     }
 
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
+    public void setOrderNo(Long orderNo) {
+        this.orderNo = orderNo;
     }
 
     public String getCourierId() {
@@ -46,20 +41,20 @@ public class DeliveryAssignedEvent {
         this.courierId = courierId;
     }
 
-    public Instant getEtaFrom() {
-        return etaFrom;
+    public Instant getDeliverFrom() {
+        return deliverFrom;
     }
 
-    public void setEtaFrom(Instant etaFrom) {
-        this.etaFrom = etaFrom;
+    public void setDeliverFrom(Instant deliverFrom) {
+        this.deliverFrom = deliverFrom;
     }
 
-    public Instant getEtaTo() {
-        return etaTo;
+    public Instant getDeliverTo() {
+        return deliverTo;
     }
 
-    public void setEtaTo(Instant etaTo) {
-        this.etaTo = etaTo;
+    public void setDeliverTo(Instant deliverTo) {
+        this.deliverTo = deliverTo;
     }
 
     public AssignmentStatus getStatus() {
@@ -83,21 +78,21 @@ public class DeliveryAssignedEvent {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DeliveryAssignedEvent that = (DeliveryAssignedEvent) o;
-        return createdAt == that.createdAt && Objects.equals(orderId, that.orderId) && Objects.equals(courierId, that.courierId) && Objects.equals(etaFrom, that.etaFrom) && Objects.equals(etaTo, that.etaTo) && status == that.status;
+        return createdAt == that.createdAt && Objects.equals(orderNo, that.orderNo) && Objects.equals(courierId, that.courierId) && Objects.equals(deliverFrom, that.deliverFrom) && Objects.equals(deliverTo, that.deliverTo) && status == that.status;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(orderId, courierId, etaFrom, etaTo, status, createdAt);
+        return Objects.hash(orderNo, courierId, deliverFrom, deliverTo, status, createdAt);
     }
 
     @Override
     public String toString() {
         return "DeliveryAssignedEvent{" +
-                "orderId='" + orderId + '\'' +
+                "orderNo=" + orderNo +
                 ", courierId='" + courierId + '\'' +
-                ", etaFrom=" + etaFrom +
-                ", etaTo=" + etaTo +
+                ", deliverFrom=" + deliverFrom +
+                ", deliverTo=" + deliverTo +
                 ", status=" + status +
                 ", createdAt=" + createdAt +
                 '}';

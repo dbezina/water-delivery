@@ -1,8 +1,6 @@
 package com.bezina.water_delivery.core.model;
 
-import com.bezina.water_delivery.core.model.OrderStatus;
 import jakarta.persistence.*;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +11,9 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
+
+    @Column(name = "order_no", nullable = false, unique = true)
+    private Long orderNo;
 
     @Column(nullable = false)
     private String userId;
@@ -31,8 +32,9 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderStatusHistory> statusHistory = new ArrayList<>();
 
-    public Order(String id, String userId, String address, List<OrderItem> items, List<OrderStatusHistory> statusHistory, Instant createdAt ) {
+    public Order(String id,Long orderNo, String userId, String address, List<OrderItem> items, List<OrderStatusHistory> statusHistory, Instant createdAt ) {
         this.id = id;
+        this.orderNo = orderNo;
         this.userId = userId;
         this.address = address;
         this.items = items;
@@ -41,6 +43,18 @@ public class Order {
     }
 
     public Order() {
+    }
+    @PrePersist
+    public void onCreate() {
+        createdAt = Instant.now();
+    }
+
+    public Long getOrderNo() {
+        return orderNo;
+    }
+
+    public void setOrderNo(Long orderNo) {
+        this.orderNo = orderNo;
     }
 
     public String getId() {

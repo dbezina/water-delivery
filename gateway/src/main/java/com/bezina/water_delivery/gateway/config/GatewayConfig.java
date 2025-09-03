@@ -43,7 +43,7 @@ public class GatewayConfig {
                             return chain.filter(exchange);
                         }))
                         .uri("http://localhost:8082"))
-            /*    .route("delivery-admin", r -> r.path("/admin/**")
+               /* .route("delivery-admin", r -> r.path("/admin/delivery/**")
                         .filters(f -> f.filter(jwtAuthRouteFilter).filter((exchange, chain) -> {
                             String role = exchange.getAttribute("role");
                             if (!"ROLE_ADMIN".equals(role)) {
@@ -52,6 +52,32 @@ public class GatewayConfig {
                             }
                             return chain.filter(exchange);
                         }))
+
+                        .uri("http://localhost:8083"))*/
+                .route("delivery-admin", r -> r.path("/admin/delivery/**")
+                        .filters(f -> f.filter(jwtAuthRouteFilter)
+                                .filter((exchange, chain) -> {
+                                    String role = exchange.getAttribute("role");
+                                    if (!"ROLE_ADMIN".equals(role)) {
+                                        exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+                                        return exchange.getResponse().setComplete();
+                                    }
+                                    return chain.filter(exchange);
+                                })
+                                .rewritePath("/admin/(?<segment>.*)", "/admin/${segment}"))
+                        .uri("http://localhost:8083"))
+       /*         .route("delivery-admin", r -> r.path("/admin/delivery/{orderId}/status")
+                        .filters(f -> f.filter(jwtAuthRouteFilter)
+                                .filter((exchange, chain) -> {
+                                    String role = exchange.getAttribute("role");
+                                    if (!"ROLE_ADMIN".equals(role)) {
+                                        exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+                                        return exchange.getResponse().setComplete();
+                                    }
+                                    return chain.filter(exchange);
+                                })
+                                .rewritePath("/admin/delivery/(?<orderId>.*)/status",
+                                        "/admin/delivery/${orderId}/status")) // <-- тут переписываем путь
                         .uri("http://localhost:8083"))*/
                 .route("delivery-courier", r -> r.path("/courier/**")
                         .filters(f -> f.filter(jwtAuthRouteFilter).filter((exchange, chain) -> {
