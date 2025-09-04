@@ -28,7 +28,6 @@ public class InventoryEventHandler {
     }
 
 
-
     @KafkaListener(
             topics = "orders.order_created",
             groupId = "inventory-service",

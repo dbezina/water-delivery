@@ -1,6 +1,8 @@
 package com.bezina.water_delivery.order_service.services;
 
 import com.bezina.water_delivery.core.DTO.OrderItemDto;
+import com.bezina.water_delivery.core.events.OrderConfirmedEvent;
+import com.bezina.water_delivery.core.events.PaymentConfirmedEvent;
 import com.bezina.water_delivery.core.model.OrderItem;
 import com.bezina.water_delivery.core.model.OrderStatusHistory;
 
@@ -9,6 +11,7 @@ import com.bezina.water_delivery.core.model.Order;
 import com.bezina.water_delivery.core.model.OrderStatus;
 import com.bezina.water_delivery.order_service.DAO.OrderRepository;
 import com.bezina.water_delivery.order_service.DAO.OrderStatusHistoryRepository;
+import com.bezina.water_delivery.order_service.kafka.OrderEventProducer;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,12 +25,14 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderStatusHistoryRepository historyRepository;
     private final OrderNoGenerator orderNoGenerator;
+    private final OrderEventProducer eventProducer;
 
     public OrderService(OrderRepository orderRepository,
-                        OrderStatusHistoryRepository historyRepository, OrderNoGenerator orderNoGenerator) {
+                        OrderStatusHistoryRepository historyRepository, OrderNoGenerator orderNoGenerator, OrderEventProducer eventProducer) {
         this.orderRepository = orderRepository;
         this.historyRepository = historyRepository;
         this.orderNoGenerator = orderNoGenerator;
+        this.eventProducer = eventProducer;
     }
 
     /**
@@ -91,5 +96,26 @@ public class OrderService {
 
     public void updateStatusFromCourier(String orderId, OrderStatus status) {
         Order order =  updateStatus(orderId, status);
+    }
+    public void confirmOrder(PaymentConfirmedEvent event) {
+        orderRepository.findById(event.getOrderId()).ifPresent(order -> {
+            if (order.getStatus() == OrderStatus.PENDING) {
+                order.setStatus(OrderStatus.CONFIRMED);
+                orderRepository.save(order);
+
+                // пишем в историю
+                OrderStatusHistory history = new OrderStatusHistory();
+                history.setOrder(order);
+                history.setStatus(OrderStatus.CONFIRMED);
+                history.setChangedAt(Instant.ofEpochMilli(event.getConfirmedAt()));
+                historyRepository.save(history);
+
+                // генерируем событие order.confirmed
+                OrderConfirmedEvent confirmedEvent = OrderConfirmedEvent.fromOrder(order);
+                eventProducer.sendOrderConfirmedEvent(confirmedEvent);
+
+                System.out.println("✅ Order " + order.getId() + " confirmed and published");
+            }
+        });
     }
 }

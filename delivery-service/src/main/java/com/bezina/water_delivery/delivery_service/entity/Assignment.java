@@ -21,6 +21,8 @@ public class Assignment {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AssignmentStatus status;
+    @OneToOne(mappedBy = "assignment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private AssignmentDetails details;
 
     private Instant deliverFrom;
     private Instant deliverTo;
@@ -39,18 +41,12 @@ public class Assignment {
         updatedAt = Instant.now();
     }
 
-    public Assignment(String id,
-                      Long orderNo,
-                      String courierId,
-                      AssignmentStatus status,
-                      Instant deliverFrom,
-                      Instant deliverTo,
-                      Instant createdAt,
-                      Instant updatedAt) {
+    public Assignment(String id, Long orderNo, String courierId, AssignmentStatus status, AssignmentDetails details, Instant deliverFrom, Instant deliverTo, Instant createdAt, Instant updatedAt) {
         this.id = id;
         this.orderNo = orderNo;
         this.courierId = courierId;
         this.status = status;
+        this.details = details;
         this.deliverFrom = deliverFrom;
         this.deliverTo = deliverTo;
         this.createdAt = createdAt;
@@ -124,28 +120,36 @@ public class Assignment {
         this.updatedAt = updatedAt;
     }
 
+    public AssignmentDetails getDetails() {
+        return details;
+    }
+
+    public void setDetails(AssignmentDetails details) {
+        this.details = details;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Assignment that = (Assignment) o;
-        return Objects.equals(id, that.id) && Objects.equals(orderNo, that.orderNo) && Objects.equals(courierId, that.courierId) && status == that.status && Objects.equals(deliverFrom, that.deliverFrom) && Objects.equals(deliverTo, that.deliverTo) && Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt);
+        return Objects.equals(id, that.id) && Objects.equals(orderNo, that.orderNo) && Objects.equals(courierId, that.courierId) && status == that.status && Objects.equals(details, that.details) && Objects.equals(deliverFrom, that.deliverFrom) && Objects.equals(deliverTo, that.deliverTo) && Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, orderNo, courierId, status, deliverFrom, deliverTo, createdAt, updatedAt);
+        return Objects.hash(id, orderNo, courierId, status, details, deliverFrom, deliverTo, createdAt, updatedAt);
     }
 
     @Override
     public String toString() {
         return "Assignment{" +
                 "id='" + id + '\'' +
-                ", orderId='" + orderNo + '\'' +
+                ", orderNo=" + orderNo +
                 ", courierId='" + courierId + '\'' +
                 ", status=" + status +
-                ", etaFrom=" + deliverFrom +
-                ", etaTo=" + deliverTo +
+                ", deliverFrom=" + deliverFrom +
+                ", deliverTo=" + deliverTo +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';

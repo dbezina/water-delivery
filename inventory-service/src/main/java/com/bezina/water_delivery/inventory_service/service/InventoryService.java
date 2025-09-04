@@ -42,7 +42,8 @@ public class InventoryService {
                 producer.sendLowStockEvent(new LowStockEvent(
                         inv.getSize(),
                         "Product " + inv.getSize() + " is out of stock!",
-                        Instant.now().toEpochMilli()
+                        Instant.now()
+                       // Instant.now().toEpochMilli()
                 ));
                 System.out.println("msg for Admin  : Product " + inv.getSize() + " is out of stock!");
             }

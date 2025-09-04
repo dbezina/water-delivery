@@ -5,5 +5,6 @@ public enum AssignmentStatus {
     CONFIRMED,   // подтверждено
     IN_ROUTE,    // в пути
     DELIVERED ,   // доставлено
+    FAILED,    //не удалось вручить
     CANCELLED
 }

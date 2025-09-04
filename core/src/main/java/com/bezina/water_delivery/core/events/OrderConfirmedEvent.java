@@ -1,23 +1,43 @@
-package com.bezina.water_delivery.inventory_service.events;
+package com.bezina.water_delivery.core.events;
 
 import com.bezina.water_delivery.core.DTO.OrderItemDto;
+import com.bezina.water_delivery.core.model.Order;
+import com.bezina.water_delivery.core.model.OrderItem;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
-public class StockReservedEvent {
+public class OrderConfirmedEvent {
     private String orderId;
+    private Long orderNo;
     private String userId;
     private List<OrderItemDto> items;
     private String address;
+
+    //  @JsonFormat(shape = JsonFormat.Shape.NUMBER) // millis
     private Instant createdAt;
 
-    public StockReservedEvent() {
+    public OrderConfirmedEvent() {
     }
 
-    public StockReservedEvent(String orderId, String userId, List<OrderItemDto> items, String address, Instant createdAt) {
+    public static OrderConfirmedEvent fromOrder(Order order){
+        return new OrderConfirmedEvent(
+                order.getId(),
+                order.getOrderNo(),
+                order.getUserId(),
+                order.getItems().stream()
+                        .map(i -> new OrderItemDto(i.getSize(), i.getQuantity()))
+                        .collect(Collectors.toList()),
+                order.getAddress(),
+                order.getCreatedAt()
+                );
+    }
+
+    public OrderConfirmedEvent(String orderId, Long orderNo, String userId, List<OrderItemDto> items, String address, Instant createdAt) {
         this.orderId = orderId;
+        this.orderNo = orderNo;
         this.userId = userId;
         this.items = items;
         this.address = address;
@@ -30,6 +50,14 @@ public class StockReservedEvent {
 
     public void setOrderId(String orderId) {
         this.orderId = orderId;
+    }
+
+    public Long getOrderNo() {
+        return orderNo;
+    }
+
+    public void setOrderNo(Long orderNo) {
+        this.orderNo = orderNo;
     }
 
     public String getUserId() {
@@ -68,19 +96,20 @@ public class StockReservedEvent {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        StockReservedEvent that = (StockReservedEvent) o;
-        return createdAt == that.createdAt && Objects.equals(orderId, that.orderId) && Objects.equals(userId, that.userId) && Objects.equals(items, that.items) && Objects.equals(address, that.address);
+        OrderConfirmedEvent that = (OrderConfirmedEvent) o;
+        return Objects.equals(orderId, that.orderId) && Objects.equals(orderNo, that.orderNo) && Objects.equals(userId, that.userId) && Objects.equals(items, that.items) && Objects.equals(address, that.address) && Objects.equals(createdAt, that.createdAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(orderId, userId, items, address, createdAt);
+        return Objects.hash(orderId, orderNo, userId, items, address, createdAt);
     }
 
     @Override
     public String toString() {
-        return "StockReservedEvent{" +
+        return "OrderConfirmedEvent{" +
                 "orderId='" + orderId + '\'' +
+                ", orderNo=" + orderNo +
                 ", userId='" + userId + '\'' +
                 ", items=" + items +
                 ", address='" + address + '\'' +

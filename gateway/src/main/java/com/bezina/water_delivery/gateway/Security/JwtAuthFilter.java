@@ -26,7 +26,13 @@ public class JwtAuthFilter implements WebFilter {
 
      @Override
      public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+         String path = exchange.getRequest().getPath().toString();
+         if (path.startsWith("/auth/")) {
+             return chain.filter(exchange); // пропускаем без проверки
+         }
+
          String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+
          if (authHeader == null || !authHeader.startsWith("Bearer ")) {
              exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
              return exchange.getResponse().setComplete();

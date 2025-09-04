@@ -29,8 +29,7 @@ public class GatewayConfig {
     public RouteLocator routes(RouteLocatorBuilder builder) {
         LOGGER.info("RouteLocator");
         return builder.routes()
-                .route("auth", r -> r.path("/auth/**")
-                        .filters(f -> f.filter(jwtAuthRouteFilter))
+                .route("auth-service", r -> r.path("/auth/**")
                         .uri("http://localhost:8081"))
                 .route("orders", r -> r.path("/user/**")
                         .filters(f -> f.filter(jwtAuthRouteFilter).filter((exchange, chain) -> {
@@ -90,16 +89,19 @@ public class GatewayConfig {
                         }))
                         .uri("http://localhost:8083"))
 
-               .route("inventory", r -> r.path("/admin/inventory/**")
-                        .filters(f -> f.filter(jwtAuthRouteFilter).filter((exchange, chain) -> {
-                            String role = exchange.getAttribute("role");
-                            if (!"ROLE_ADMIN".equals(role)) {
-                                exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
-                                return exchange.getResponse().setComplete();
-                            }
-                            return chain.filter(exchange);
-                        }))
+                .route("admin-inventory", r -> r.path("/admin/inventory/**")
+                        .filters(f -> f.stripPrefix(1) // <-- удалит "/admin"
+                                .filter(jwtAuthRouteFilter)
+                                .filter((exchange, chain) -> {
+                                    String role = exchange.getAttribute("role");
+                                    if (!"ROLE_ADMIN".equals(role)) {
+                                        exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+                                        return exchange.getResponse().setComplete();
+                                    }
+                                    return chain.filter(exchange);
+                                }))
                         .uri("http://localhost:8084"))
+
                 .route("admin-orders", r -> r.path("/admin/orders/**")
                         .filters(f -> f.filter(jwtAuthRouteFilter).filter((exchange, chain) -> {
                             String role = exchange.getAttribute("role");

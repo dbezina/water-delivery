@@ -12,12 +12,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "*") // или конкретный фронтенд URL
+//@CrossOrigin(origins = "*") // или конкретный фронтенд URL
 public class AuthController {
 
     private final UserRepository userRepository;
@@ -72,9 +73,16 @@ public class AuthController {
         // грузим пользователя
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
 
+        // достаём роль
+        String role = userDetails.getAuthorities()
+                .stream()
+                .findFirst()
+                .map(GrantedAuthority::getAuthority)
+                .orElse(null);
+
         // генерим токен
         String token = jwtService.generateToken(userDetails);
 
-        return ResponseEntity.ok(new AuthResponse(token));
+        return ResponseEntity.ok(new AuthResponse(token, role));
     }
 }

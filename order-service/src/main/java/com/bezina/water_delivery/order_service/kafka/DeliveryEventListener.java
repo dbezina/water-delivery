@@ -44,7 +44,7 @@ public class DeliveryEventListener {
     }
 
     @KafkaListener(
-            topics = "delivery.events",
+            topics = "delivery.events.status-changed",
             groupId = "order-service",
             containerFactory = "deliveryStatusKafkaListenerFactory"
     )

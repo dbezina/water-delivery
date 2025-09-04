@@ -6,6 +6,7 @@ import com.bezina.water_delivery.core.model.OrderStatus;
 import com.bezina.water_delivery.core.model.OrderStatusHistory;
 import com.bezina.water_delivery.order_service.DAO.OrderRepository;
 import com.bezina.water_delivery.order_service.DAO.OrderStatusHistoryRepository;
+import com.bezina.water_delivery.order_service.services.OrderService;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
@@ -16,34 +17,26 @@ public class PaymentEventListener {
 
     private final OrderRepository orderRepository;
     private final OrderStatusHistoryRepository historyRepository;
+    private final OrderService orderService;
 
     public PaymentEventListener(OrderRepository orderRepository,
-                                OrderStatusHistoryRepository historyRepository) {
+                                OrderStatusHistoryRepository historyRepository, OrderEventProducer eventProducer, OrderService orderService) {
         this.orderRepository = orderRepository;
         this.historyRepository = historyRepository;
+        this.orderService = orderService;
     }
 
-    @KafkaListener(topics = "payment.confirmed", groupId = "order-service",
+    @KafkaListener(
+            topics = "payment.confirmed",
+            groupId = "order-service",
             containerFactory = "paymentConfirmedKafkaListenerFactory")
     public void handleConfirmed(PaymentConfirmedEvent event) {
-        orderRepository.findById(event.getOrderId()).ifPresent(order -> {
-            if (order.getStatus() == OrderStatus.PENDING) {
-                order.setStatus(OrderStatus.CONFIRMED);
-                orderRepository.save(order);
-
-                // пишем в историю
-                OrderStatusHistory history = new OrderStatusHistory();
-                history.setOrder(order);
-                history.setStatus(OrderStatus.CONFIRMED);
-                history.setChangedAt(Instant.ofEpochMilli(event.getConfirmedAt()));
-                historyRepository.save(history);
-
-                 System.out.println("✅ Order " + order.getId() + " confirmed");
-            }
-        });
+            orderService.confirmOrder(event);
     }
 
-    @KafkaListener(topics = "payment.failed", groupId = "order-service",
+    @KafkaListener(
+            topics = "payment.failed",
+            groupId = "order-service",
             containerFactory = "paymentFailedKafkaListenerFactory")
     public void handleFailed(PaymentFailedEvent event) {
         orderRepository.findById(event.getOrderId()).ifPresent(order -> {

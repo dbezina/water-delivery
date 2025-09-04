@@ -16,7 +16,9 @@ public class MockPaymentService {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    @KafkaListener(topics = "orders.order_created", groupId = "payment-service",
+    @KafkaListener(
+            topics = "orders.order_created",
+            groupId = "payment-service",
             containerFactory = "orderCreatedKafkaListenerFactory")
     public void handleNewOrder(OrderCreatedEvent event) {
         // Эмулируем оплату

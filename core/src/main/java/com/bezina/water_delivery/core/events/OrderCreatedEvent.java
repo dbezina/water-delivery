@@ -3,7 +3,9 @@ package com.bezina.water_delivery.core.events;
 
 
 import com.bezina.water_delivery.core.DTO.OrderItemDto;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
@@ -13,13 +15,15 @@ import java.util.Objects;
         private String userId;
         private List<OrderItemDto> items;
         private String address;
-        private long createdAt;
+
+      //  @JsonFormat(shape = JsonFormat.Shape.NUMBER) // millis
+        private Instant createdAt;
 
 
         public OrderCreatedEvent() {
     }
 
-        public OrderCreatedEvent(String orderId, Long orderNo, String userId, List<OrderItemDto> items, String address, long createdAt) {
+        public OrderCreatedEvent(String orderId, Long orderNo, String userId, List<OrderItemDto> items, String address, Instant createdAt) {
             this.orderId = orderId;
             this.orderNo = orderNo;
             this.userId = userId;
@@ -68,11 +72,11 @@ import java.util.Objects;
             this.address = address;
         }
 
-        public long getCreatedAt() {
+        public Instant getCreatedAt() {
             return createdAt;
         }
 
-        public void setCreatedAt(long createdAt) {
+        public void setCreatedAt(Instant createdAt) {
             this.createdAt = createdAt;
         }
 
@@ -81,7 +85,7 @@ import java.util.Objects;
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             OrderCreatedEvent that = (OrderCreatedEvent) o;
-            return createdAt == that.createdAt && Objects.equals(orderId, that.orderId) && Objects.equals(orderNo, that.orderNo) && Objects.equals(userId, that.userId) && Objects.equals(items, that.items) && Objects.equals(address, that.address);
+            return Objects.equals(orderId, that.orderId) && Objects.equals(orderNo, that.orderNo) && Objects.equals(userId, that.userId) && Objects.equals(items, that.items) && Objects.equals(address, that.address) && Objects.equals(createdAt, that.createdAt);
         }
 
         @Override

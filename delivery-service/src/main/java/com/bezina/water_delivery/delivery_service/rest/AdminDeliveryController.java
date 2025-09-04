@@ -2,18 +2,21 @@ package com.bezina.water_delivery.delivery_service.rest;
 
 import com.bezina.water_delivery.delivery_service.DAO.AssignmentRepository;
 import com.bezina.water_delivery.delivery_service.DTO.AssignRequest;
+import com.bezina.water_delivery.delivery_service.DTO.AssignmentDto;
 import com.bezina.water_delivery.delivery_service.DTO.UpdateStatusRequest;
 import com.bezina.water_delivery.delivery_service.entity.Assignment;
 import com.bezina.water_delivery.delivery_service.entity.enums.AssignmentStatus;
 import com.bezina.water_delivery.delivery_service.events.DeliveryAssignedEvent;
 import com.bezina.water_delivery.delivery_service.events.DeliveryStatusChangedEvent;
 import com.bezina.water_delivery.delivery_service.kafka.DeliveryEventProducer;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/admin/delivery")
@@ -56,36 +59,59 @@ public class AdminDeliveryController {
     }
 
     // PATCH /admin/delivery/{orderId}/status {status}
-    @PatchMapping("/{orderId}/status")
-    public Assignment updateStatus(@RequestParam Long orderNo,
-                                   @RequestBody UpdateStatusRequest request) {
+    @PatchMapping("/{orderNo}/status")
+    public ResponseEntity<?> updateStatus(@PathVariable Long orderNo,
+                                          @RequestBody UpdateStatusRequest request) {
+        try {
+            // Ищем назначение доставки по номеру заказа
+            Assignment assignment = assignmentRepository.findByOrderNo(orderNo)
+                    .orElseThrow(() -> new RuntimeException(
+                            "No delivery assignment found for order " + orderNo));
 
-       Assignment assignment = assignmentRepository.findByOrderNo(orderNo)
-               .orElseThrow(() -> new RuntimeException("No delivery assignment found for order " + orderNo));
+            // Обновляем статус
+            assignment.setStatus(request.getStatus());
+            assignment.setUpdatedAt(Instant.now());
 
-         assignment.setStatus(request.getStatus());
-     //   System.out.println("status get "+request.getStatus());
-    //    System.out.println("assignment "+assignment.getStatus()+ assignment.getUpdatedAt());
-    //    System.out.println(assignment.toString());
+            Assignment saved = assignmentRepository.save(assignment);
 
-        Assignment saved = assignmentRepository.save(assignment);
+            // Публикуем событие в Kafka
+            DeliveryStatusChangedEvent event = new DeliveryStatusChangedEvent(
+                    saved.getOrderNo(),
+                    saved.getStatus(),
+                    Instant.now().toEpochMilli()
+            );
+            eventProducer.sendDeliveryEvent(event);
 
-        // публикуем событие
-        eventProducer.sendDeliveryEvent(new DeliveryStatusChangedEvent(
-                saved.getOrderNo(), saved.getStatus(),
-                Instant.now().toEpochMilli()
-        ));
-        System.out.println("DeliveryStatusChangedEvent saved"+saved.getOrderNo()+" "+ saved.getStatus());
+            System.out.println("✅ DeliveryStatusChangedEvent published: orderNo="
+                    + saved.getOrderNo() + ", status=" + saved.getStatus());
 
-        return saved;
+            // Возвращаем JSON с обновленным статусом
+            Map<String, Object> response = Map.of(
+                    "orderNo", saved.getOrderNo(),
+                    "status", saved.getStatus()
+            );
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Map<String, String> error = Map.of(
+                    "message", "Failed to update delivery status",
+                    "error", e.getMessage()
+            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
     }
     @GetMapping("/assignments/all")
-    public ResponseEntity<List<Assignment>> getAllAssignments(@RequestHeader("X-User-Id") String userId,
-                                                              @RequestHeader("X-User-Role") String role) {
+    public ResponseEntity<List<AssignmentDto>> getAllAssignments(@RequestHeader("X-User-Id") String userId,
+                                                                 @RequestHeader("X-User-Role") String role) {
         if ("ROLE_ADMIN".equals(role)) {
-            List<Assignment> assignments = assignmentRepository.findAll();
-            return ResponseEntity.ok(assignments);
+            List<AssignmentDto> dtos = assignmentRepository.findAll()
+                    .stream()
+                    .map(AssignmentDto::fromEntity)
+                    .toList();
+            return ResponseEntity.ok(dtos);
         }
-        return (ResponseEntity<List<Assignment>>) ResponseEntity.badRequest();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
+
 }

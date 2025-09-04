@@ -1,6 +1,6 @@
 package com.bezina.water_delivery.order_service.rest;
 
-import com.bezina.water_delivery.core.DTO.OrderItemDto;
+import com.bezina.water_delivery.core.DTO.OrderDto;
 import com.bezina.water_delivery.core.events.OrderCreatedEvent;
 import com.bezina.water_delivery.core.model.Order;
 
@@ -12,10 +12,12 @@ import com.bezina.water_delivery.order_service.services.OrderNoGenerator;
 import com.bezina.water_delivery.order_service.services.OrderService;
 
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/user/orders")
@@ -32,33 +34,49 @@ public class OrderController {
         this.historyRepository = historyRepository;
         this.eventProducer = eventProducer;
         this.orderNoGenerator = orderNoGenerator;
-        orderService = new OrderService(orderRepository, historyRepository, this.orderNoGenerator);
+        orderService = new OrderService(orderRepository, historyRepository, this.orderNoGenerator, eventProducer);
 
     }
 
    @PostMapping
-   public String createOrder(@Valid @RequestBody CreateOrderRequest request,
-                             @RequestHeader("X-User-Id") String userId,
-                             @RequestHeader("X-User-Role") String role) {
+   public ResponseEntity<?> createOrder(@Valid @RequestBody CreateOrderRequest request,
+                                               @RequestHeader("X-User-Id") String userId,
+                                               @RequestHeader("X-User-Role") String role) {
        // save order
-       Order saved =  orderService.createOrder(userId,request.getAddress(),request.getItems() );
+       try {
+           // Сохраняем заказ
+           Order saved = orderService.createOrder(userId, request.getAddress(), request.getItems());
 
-       // create event
-       OrderCreatedEvent event = new OrderCreatedEvent(
-               saved.getId(),
-               saved.getOrderNo(),
-               saved.getUserId(),
-               saved.getItems().stream()
-                       .map(i -> new OrderItemDto(i.getSize(), i.getQuantity()))
-                       .collect(Collectors.toList()),
-               saved.getAddress(),
-               Instant.now().toEpochMilli()
-       );
+           // Создаём DTO для отправки в ответ
+           OrderDto orderDto = OrderDto.fromEntity(saved);
 
-       // send to Kafka
-       eventProducer.sendOrderCreatedEvent(event);
+           // Создаём событие для Kafka
+           OrderCreatedEvent event = new OrderCreatedEvent(
+                   saved.getId(),
+                   saved.getOrderNo(),
+                   saved.getUserId(),
+                   orderDto.getItems(),
+                   saved.getAddress(),
+                   Instant.now()
+           );
 
-       return saved.getId();
+           // Отправляем в Kafka
+           eventProducer.sendOrderCreatedEvent(event);
+
+           // Возвращаем сохранённый заказ в JSON
+           return ResponseEntity.ok(orderDto);
+
+       } catch (Exception e) {
+           // Логируем ошибку
+           e.printStackTrace();
+
+           // Возвращаем сообщение об ошибке
+           Map<String, String> error = Map.of(
+                   "message", "Failed to create order",
+                   "error", e.getMessage()
+           );
+           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+       }
    }
 
 }

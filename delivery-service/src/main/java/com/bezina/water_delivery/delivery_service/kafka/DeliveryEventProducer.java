@@ -1,5 +1,6 @@
 package com.bezina.water_delivery.delivery_service.kafka;
 
+import com.bezina.water_delivery.delivery_service.events.CourierAssignmentEvent;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,10 @@ public class DeliveryEventProducer {
     }
 
     public void sendDeliveryEvent(Object event) {
-        kafkaTemplate.send("delivery.events", UUID.randomUUID().toString(), event);
+        kafkaTemplate.send("delivery.events.status-changed", UUID.randomUUID().toString(), event);
+    }
+
+    public void sendCourierAssignmentEvent(CourierAssignmentEvent courierAssignmentEvent) {
+        kafkaTemplate.send("courier.events", UUID.randomUUID().toString(), courierAssignmentEvent);
     }
 }

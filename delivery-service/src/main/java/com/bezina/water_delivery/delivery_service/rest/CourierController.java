@@ -2,6 +2,7 @@ package com.bezina.water_delivery.delivery_service.rest;
 
 
 import com.bezina.water_delivery.delivery_service.DAO.AssignmentRepository;
+import com.bezina.water_delivery.delivery_service.DTO.AssignmentDto;
 import com.bezina.water_delivery.delivery_service.DTO.CourierUpdateRequest;
 import com.bezina.water_delivery.delivery_service.entity.Assignment;
 import com.bezina.water_delivery.delivery_service.service.UpdateMessages;
@@ -11,7 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/courier")
@@ -25,15 +28,18 @@ public class CourierController {
         this.updateService = updateService;
     }
 
-    @PatchMapping("/{orderId}/status")
-    public ResponseEntity<String> updateOrderStatus(
-            @RequestParam Long orderNo,
+    @PatchMapping("/{orderNo}/status")
+    public ResponseEntity<Map<String, Object>> updateOrderStatus(
+            @PathVariable("orderNo") Long orderNo,
             @RequestBody CourierUpdateRequest request,
             @RequestHeader("X-User-Id") String userId,
             @RequestHeader("X-User-Role") String role) {
 
         if (!"ROLE_COURIER".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied");
+            Map<String, Object> response = new HashMap<>();
+            response.put("orderNo", orderNo);
+            response.put("status", ResponseEntity.status(HttpStatus.FORBIDDEN));
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
         }
         Assignment assignment = assignmentRepository.findByOrderNo(orderNo)
                 .orElseThrow(() -> new EntityNotFoundException("Assignment not found for orderId " + orderNo));
@@ -43,15 +49,23 @@ public class CourierController {
 
         assignmentRepository.save(assignment);
         updateService.sendUpdateStatusMessageToKafka(assignment);
-        return ResponseEntity.ok("Order " + orderNo + " updated to " + request.getStatus());
+       // return ResponseEntity.ok("Order " + orderNo + " updated to " + request.getStatus());
+        Map<String, Object> response = new HashMap<>();
+        response.put("orderNo", orderNo);
+        response.put("status", request.getStatus());
+
+        return ResponseEntity.ok(response);
     }
     @GetMapping("/assignments/my")
-    public ResponseEntity<List<Assignment>> getAllAssignments(@RequestHeader("X-User-Id") String userId,
-                                                              @RequestHeader("X-User-Role") String role) {
+    public ResponseEntity<List<AssignmentDto>> getAllAssignments(@RequestHeader("X-User-Id") String userId,
+                                                                @RequestHeader("X-User-Role") String role) {
         if ("ROLE_COURIER".equals(role)) {
-            List<Assignment> assignments = assignmentRepository.findAllByCourierId(userId);
-            return ResponseEntity.ok(assignments);
+            List<AssignmentDto> dtos = assignmentRepository.findAllByCourierId(userId)
+                    .stream()
+                    .map(AssignmentDto::fromEntity)
+                    .toList();
+            return ResponseEntity.ok(dtos);
         }
-        return (ResponseEntity<List<Assignment>>) ResponseEntity.badRequest();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 }

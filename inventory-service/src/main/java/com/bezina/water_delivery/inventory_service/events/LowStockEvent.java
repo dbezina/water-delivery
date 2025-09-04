@@ -1,13 +1,14 @@
 package com.bezina.water_delivery.inventory_service.events;
 
+import java.time.Instant;
 import java.util.Objects;
 
 public class LowStockEvent {
     private String size;   // например "18L"
     private String message;
-    private long createdAt;
+    private Instant createdAt;
 
-    public LowStockEvent(String size, String message, long createdAt) {
+    public LowStockEvent(String size, String message, Instant createdAt) {
         this.size = size;
         this.message = message;
         this.createdAt = createdAt;
@@ -32,11 +33,11 @@ public class LowStockEvent {
         this.message = message;
     }
 
-    public long getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(long createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 

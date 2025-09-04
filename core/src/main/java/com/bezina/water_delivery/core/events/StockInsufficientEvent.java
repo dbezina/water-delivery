@@ -1,13 +1,16 @@
 package com.bezina.water_delivery.core.events;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+
+import java.time.Instant;
 import java.util.Objects;
 
 public class StockInsufficientEvent {
     private String orderId;
     private String reason;
-    private Long failedAt;
+    private Instant failedAt;
 
-    public StockInsufficientEvent(String orderId, String reason, Long failedAt) {
+    public StockInsufficientEvent(String orderId, String reason, Instant failedAt) {
         this.orderId = orderId;
         this.reason = reason;
         this.failedAt = failedAt;
@@ -32,11 +35,11 @@ public class StockInsufficientEvent {
         this.reason = reason;
     }
 
-    public Long getFailedAt() {
+    public Instant getFailedAt() {
         return failedAt;
     }
 
-    public void setFailedAt(Long failedAt) {
+    public void setFailedAt(Instant failedAt) {
         this.failedAt = failedAt;
     }
 
