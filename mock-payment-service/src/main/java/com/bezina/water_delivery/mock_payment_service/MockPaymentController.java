@@ -20,14 +20,14 @@ public class MockPaymentController {
 
     @PostMapping("/{orderId}/confirm")
     public String confirm(@PathVariable String orderId) {
-        PaymentConfirmedEvent event = new PaymentConfirmedEvent(orderId, System.currentTimeMillis());
+        PaymentConfirmedEvent event = new PaymentConfirmedEvent(orderId,Long.getLong(orderId), System.currentTimeMillis());
         kafkaTemplate.send("payment.confirmed", orderId, event);
         return "Payment CONFIRMED for order " + orderId;
     }
 
     @PostMapping("/{orderId}/fail")
     public String fail(@PathVariable String orderId) {
-        PaymentFailedEvent event = new PaymentFailedEvent(orderId, "Manual fail", System.currentTimeMillis());
+        PaymentFailedEvent event = new PaymentFailedEvent(orderId, Long.getLong(orderId), "Manual fail", System.currentTimeMillis());
         kafkaTemplate.send("payment.failed", orderId, event);
         return "Payment FAILED for order " + orderId;
     }

@@ -18,6 +18,7 @@ public class UpdateMessages {
     // публикуем событие
         eventProducer.sendIsDeliveredStatusEvent(new IsDeliveredEvent(
                 assignment.getOrderNo(),
+                assignment.getStatus(),
                 Instant.now().toEpochMilli()
         ));
         System.out.println("DeliveryStatusChangedEvent saved"+assignment.getOrderNo()+" "+ assignment.getStatus());

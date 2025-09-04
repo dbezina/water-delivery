@@ -1,13 +1,13 @@
 package com.bezina.water_delivery.delivery_service.rest;
 
+import com.bezina.water_delivery.core.events.DeliveryStatusChangedEvent;
+import com.bezina.water_delivery.core.model.enums.OrderStatus;
 import com.bezina.water_delivery.delivery_service.DAO.AssignmentRepository;
 import com.bezina.water_delivery.delivery_service.DTO.AssignRequest;
 import com.bezina.water_delivery.core.DTO.AssignmentDto;
 import com.bezina.water_delivery.delivery_service.DTO.UpdateStatusRequest;
 import com.bezina.water_delivery.core.model.Assignment;
-import com.bezina.water_delivery.core.model.enums.AssignmentStatus;
 import com.bezina.water_delivery.delivery_service.events.DeliveryAssignedEvent;
-import com.bezina.water_delivery.delivery_service.events.DeliveryStatusChangedEvent;
 import com.bezina.water_delivery.delivery_service.kafka.DeliveryEventProducer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +40,7 @@ public class AdminDeliveryController {
         Assignment assignment = new Assignment();
         assignment.setOrderNo(request.getOrderNo());
         assignment.setCourierId(request.getCourierId());
-        assignment.setStatus(AssignmentStatus.QUEUED);
+        assignment.setStatus(OrderStatus.QUEUED);
         assignment.setDeliverFrom(Instant.now().plus(3, ChronoUnit.HOURS));
         assignment.setDeliverTo(Instant.now().plus(4, ChronoUnit.HOURS));
 
@@ -50,9 +50,13 @@ public class AdminDeliveryController {
 
         // публикуем событие
         eventProducer.sendDeliveryAssignedEvent(new DeliveryAssignedEvent(
-                saved.getOrderNo(), saved.getCourierId(),
-                saved.getDeliverFrom(), saved.getDeliverTo(),
-                saved.getStatus(), Instant.now().toEpochMilli()
+               // request.getOrderId(),
+                saved.getOrderNo(),
+                saved.getCourierId(),
+                saved.getDeliverFrom(),
+                saved.getDeliverTo(),
+                saved.getStatus(),
+                Instant.now().toEpochMilli()
         ));
 
         return saved;

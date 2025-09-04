@@ -1,6 +1,6 @@
 package com.bezina.water_delivery.delivery_service.events;
 
-import com.bezina.water_delivery.core.model.enums.AssignmentStatus;
+import com.bezina.water_delivery.core.model.enums.OrderStatus;
 
 import java.time.Instant;
 import java.util.Objects;
@@ -10,10 +10,10 @@ public class DeliveryAssignedEvent {
     private String courierId;
     private Instant deliverFrom;
     private Instant deliverTo;
-    private AssignmentStatus status;
+    private OrderStatus status;
     private long createdAt;
 
-    public DeliveryAssignedEvent(Long orderNo, String courierId, Instant deliverFrom, Instant deliverTo, AssignmentStatus status, long createdAt) {
+    public DeliveryAssignedEvent(Long orderNo, String courierId, Instant deliverFrom, Instant deliverTo, OrderStatus status, long createdAt) {
         this.orderNo = orderNo;
         this.courierId = courierId;
         this.deliverFrom = deliverFrom;
@@ -57,11 +57,11 @@ public class DeliveryAssignedEvent {
         this.deliverTo = deliverTo;
     }
 
-    public AssignmentStatus getStatus() {
+    public OrderStatus getStatus() {
         return status;
     }
 
-    public void setStatus(AssignmentStatus status) {
+    public void setStatus(OrderStatus status) {
         this.status = status;
     }
 

@@ -51,6 +51,7 @@ public class InventoryEventHandler {
             System.out.println("❌ Недостаточно товара для заказа " + event.getOrderId());
             producer.sendStockInsufficient(new StockInsufficientEvent(
                     event.getOrderId(),
+                    event.getOrderNo(),
                     "Not enough stock available",
                     event.getCreatedAt()
             ));

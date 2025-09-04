@@ -40,7 +40,7 @@ public class PaymentEventListener {
             containerFactory = "paymentFailedKafkaListenerFactory")
     public void handleFailed(PaymentFailedEvent event) {
         orderRepository.findById(event.getOrderId()).ifPresent(order -> {
-            if (order.getStatus() == OrderStatus.PENDING) {
+            if (order.getStatus() == OrderStatus.QUEUED) {
                 order.setStatus(OrderStatus.CANCELLED);
                 orderRepository.save(order);
 

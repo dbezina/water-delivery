@@ -7,11 +7,13 @@ import java.util.Objects;
 
 public class StockInsufficientEvent {
     private String orderId;
+    private Long orderNo;
     private String reason;
     private Instant failedAt;
 
-    public StockInsufficientEvent(String orderId, String reason, Instant failedAt) {
+    public StockInsufficientEvent(String orderId, Long orderNo, String reason, Instant failedAt) {
         this.orderId = orderId;
+        this.orderNo = orderNo;
         this.reason = reason;
         this.failedAt = failedAt;
     }
@@ -43,23 +45,32 @@ public class StockInsufficientEvent {
         this.failedAt = failedAt;
     }
 
+    public Long getOrderNo() {
+        return orderNo;
+    }
+
+    public void setOrderNo(Long orderNo) {
+        this.orderNo = orderNo;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         StockInsufficientEvent that = (StockInsufficientEvent) o;
-        return Objects.equals(orderId, that.orderId) && Objects.equals(reason, that.reason) && Objects.equals(failedAt, that.failedAt);
+        return Objects.equals(orderId, that.orderId) && Objects.equals(orderNo, that.orderNo) && Objects.equals(reason, that.reason) && Objects.equals(failedAt, that.failedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(orderId, reason, failedAt);
+        return Objects.hash(orderId, orderNo, reason, failedAt);
     }
 
     @Override
     public String toString() {
         return "StockInsufficientEvent{" +
                 "orderId='" + orderId + '\'' +
+                ", orderNo=" + orderNo +
                 ", reason='" + reason + '\'' +
                 ", failedAt=" + failedAt +
                 '}';

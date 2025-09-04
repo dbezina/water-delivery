@@ -27,6 +27,7 @@ public class MockPaymentService {
         if (paymentOk) {
             PaymentConfirmedEvent confirmed = new PaymentConfirmedEvent(
                     event.getOrderId(),
+                    event.getOrderNo(),
                     System.currentTimeMillis()
             );
             kafkaTemplate.send("payment.confirmed", event.getOrderId(), confirmed);
@@ -34,11 +35,12 @@ public class MockPaymentService {
         } else {
             PaymentFailedEvent failed = new PaymentFailedEvent(
                     event.getOrderId(),
+                    event.getOrderNo(),
                     "Mock payment failure",
                     System.currentTimeMillis()
             );
             kafkaTemplate.send("payment.failed", event.getOrderId(), failed);
-            System.out.println("💳 Payment FAILED for order " + event.getOrderId());
+            System.out.println(" Payment FAILED for order " + event.getOrderId());
         }
     }
 }

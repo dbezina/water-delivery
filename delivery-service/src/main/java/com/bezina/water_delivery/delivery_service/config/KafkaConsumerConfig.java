@@ -21,7 +21,7 @@ public class KafkaConsumerConfig {
     public ConsumerFactory<String, OrderConfirmedEvent> orderConfirmedEventConsumerFactory() {
         JsonDeserializer<OrderConfirmedEvent> deserializer =
                 new JsonDeserializer<>(OrderConfirmedEvent.class);
-        deserializer.addTrustedPackages("com.bezina.water_delivery.core.events");
+        deserializer.addTrustedPackages("*");
 
         return new DefaultKafkaConsumerFactory<>(
                 Map.of(

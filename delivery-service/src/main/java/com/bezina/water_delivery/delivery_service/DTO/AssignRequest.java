@@ -3,15 +3,25 @@ package com.bezina.water_delivery.delivery_service.DTO;
 import java.util.Objects;
 
 public class AssignRequest {
+    private String orderId;
     private Long orderNo;
     private String courierId;
 
-    public AssignRequest(Long orderNo, String courierId) {
+    public AssignRequest(String orderId, Long orderNo, String courierId) {
+        this.orderId = orderId;
         this.orderNo = orderNo;
         this.courierId = courierId;
     }
 
     public AssignRequest() {
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
     }
 
     public Long getOrderNo() {
@@ -35,18 +45,19 @@ public class AssignRequest {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AssignRequest that = (AssignRequest) o;
-        return Objects.equals(orderNo, that.orderNo) && Objects.equals(courierId, that.courierId);
+        return Objects.equals(orderId, that.orderId) && Objects.equals(orderNo, that.orderNo) && Objects.equals(courierId, that.courierId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(orderNo, courierId);
+        return Objects.hash(orderId, orderNo, courierId);
     }
 
     @Override
     public String toString() {
         return "AssignRequest{" +
-                "orderNo=" + orderNo +
+                "orderId='" + orderId + '\'' +
+                ", orderNo=" + orderNo +
                 ", courierId='" + courierId + '\'' +
                 '}';
     }

@@ -1,10 +1,10 @@
 package com.bezina.water_delivery.core.model.enums;
 
 public enum OrderStatus {
-    PENDING,
-    CONFIRMED,
-    QUEUED,
-    IN_ROUTE,
-    DELIVERED,
-    CANCELLED,
+    QUEUED,      // заявка принята
+    CONFIRMED,   // подтверждено
+    IN_ROUTE,    // в пути
+    DELIVERED ,   // доставлено
+    FAILED,    //не удалось вручить
+    CANCELLED
 }

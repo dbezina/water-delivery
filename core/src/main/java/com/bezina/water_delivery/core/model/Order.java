@@ -23,7 +23,7 @@ public class Order {
     private String address;
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 50, nullable = false)
-    private OrderStatus status = OrderStatus.PENDING; // по умолчанию
+    private OrderStatus status = OrderStatus.QUEUED; // по умолчанию
 
     @Column
     private Instant createdAt;

@@ -1,7 +1,7 @@
 package com.bezina.water_delivery.inventory_service.kafka;
 
 import com.bezina.water_delivery.core.events.StockInsufficientEvent;
-import com.bezina.water_delivery.inventory_service.events.LowStockEvent;
+import com.bezina.water_delivery.core.events.LowStockEvent;
 import com.bezina.water_delivery.inventory_service.events.StockReservedEvent;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;

@@ -1,22 +1,22 @@
 package com.bezina.water_delivery.delivery_service.DTO;
 
-import com.bezina.water_delivery.core.model.enums.AssignmentStatus;
+import com.bezina.water_delivery.core.model.enums.OrderStatus;
 
 public class CourierUpdateRequest {
-    private AssignmentStatus status; // DELIVERED or FAILED
+    private OrderStatus status; // DELIVERED or FAILED
 
-    public CourierUpdateRequest(AssignmentStatus status) {
+    public CourierUpdateRequest(OrderStatus status) {
         this.status = status;
     }
 
     public CourierUpdateRequest() {
     }
 
-    public AssignmentStatus getStatus() {
+    public OrderStatus getStatus() {
         return status;
     }
 
-    public void setStatus(AssignmentStatus status) {
+    public void setStatus(OrderStatus status) {
         this.status = status;
     }
 }

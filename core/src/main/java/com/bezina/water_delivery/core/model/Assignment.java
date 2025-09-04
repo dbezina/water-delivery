@@ -1,7 +1,7 @@
 package com.bezina.water_delivery.core.model;
 
 
-import com.bezina.water_delivery.core.model.enums.AssignmentStatus;
+import com.bezina.water_delivery.core.model.enums.OrderStatus;
 import jakarta.persistence.*;
 
 import java.time.Instant;
@@ -21,7 +21,7 @@ public class Assignment {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private AssignmentStatus status;
+    private OrderStatus status;
     @OneToOne(mappedBy = "assignment", cascade = CascadeType.ALL, orphanRemoval = true)
     private AssignmentDetails details;
 
@@ -42,7 +42,7 @@ public class Assignment {
         updatedAt = Instant.now();
     }
 
-    public Assignment(String id, Long orderNo, String courierId, AssignmentStatus status, AssignmentDetails details, Instant deliverFrom, Instant deliverTo, Instant createdAt, Instant updatedAt) {
+    public Assignment(String id, Long orderNo, String courierId, OrderStatus status, AssignmentDetails details, Instant deliverFrom, Instant deliverTo, Instant createdAt, Instant updatedAt) {
         this.id = id;
         this.orderNo = orderNo;
         this.courierId = courierId;
@@ -81,11 +81,11 @@ public class Assignment {
         this.courierId = courierId;
     }
 
-    public AssignmentStatus getStatus() {
+    public OrderStatus getStatus() {
         return status;
     }
 
-    public void setStatus(AssignmentStatus status) {
+    public void setStatus(OrderStatus status) {
         this.status = status;
     }
 

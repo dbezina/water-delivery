@@ -1,4 +1,4 @@
-package com.bezina.water_delivery.inventory_service.events;
+package com.bezina.water_delivery.core.events;
 
 import java.time.Instant;
 import java.util.Objects;

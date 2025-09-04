@@ -31,7 +31,7 @@ public class DeliveryEventListener {
     )
     public void handleDelivered(IsDeliveredEvent event) {
 
-        orderService.updateStatusFromDelivery(event.getOrderNo(), OrderStatus.DELIVERED);
+        orderService.updateStatusFromDelivery(event.getOrderNo(), (OrderStatus.valueOf( event.getStatus().name())));
         System.out.println("📦 Order delivered: " + event);
     }
 

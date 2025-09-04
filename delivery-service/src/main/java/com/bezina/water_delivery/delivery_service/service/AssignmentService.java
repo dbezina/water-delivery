@@ -1,12 +1,12 @@
 package com.bezina.water_delivery.delivery_service.service;
 
 import com.bezina.water_delivery.core.events.OrderConfirmedEvent;
+import com.bezina.water_delivery.core.model.enums.OrderStatus;
 import com.bezina.water_delivery.delivery_service.DAO.AssignmentDetailsRepository;
 import com.bezina.water_delivery.delivery_service.DAO.AssignmentRepository;
 import com.bezina.water_delivery.core.model.Assignment;
 import com.bezina.water_delivery.core.model.AssignmentDetails;
 import com.bezina.water_delivery.core.model.AssignmentItem;
-import com.bezina.water_delivery.core.model.enums.AssignmentStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +27,7 @@ public class AssignmentService {
     public Assignment createAssignmentToConfirmedEvent (OrderConfirmedEvent event){
         Assignment assignment = new Assignment();
         assignment.setOrderNo(event.getOrderNo());
-        assignment.setStatus(AssignmentStatus.QUEUED);
+        assignment.setStatus(OrderStatus.QUEUED);
         assignment.setCourierId("cour-5");
         assignment.setDeliverFrom(Instant.now().plus(3, ChronoUnit.HOURS));
         assignment.setDeliverTo(Instant.now().plus(4, ChronoUnit.HOURS));

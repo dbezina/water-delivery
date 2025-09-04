@@ -1,9 +1,10 @@
 package com.bezina.water_delivery.delivery_service.kafka;
 
+import com.bezina.water_delivery.core.events.DeliveryStatusChangedEvent;
 import com.bezina.water_delivery.core.events.IsDeliveredEvent;
 import com.bezina.water_delivery.core.events.CourierAssignmentEvent;
 import com.bezina.water_delivery.delivery_service.events.DeliveryAssignedEvent;
-import com.bezina.water_delivery.delivery_service.events.DeliveryStatusChangedEvent;
+
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +33,7 @@ public class DeliveryEventProducer {
     }
 
     public void sendDeliveryAssignedEvent(DeliveryAssignedEvent deliveryAssignedEvent) {
-        sendDeliveryEvent(TOPIC_DELIVERY_ASSIGNED,deliveryAssignedEvent );
+        sendDeliveryEvent(TOPIC_DELIVERY_ASSIGNED, deliveryAssignedEvent );
     }
 
     public void sendDeliveryStatusChanged(DeliveryStatusChangedEvent event) {

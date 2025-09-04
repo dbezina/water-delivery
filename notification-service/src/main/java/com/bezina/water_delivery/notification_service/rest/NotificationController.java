@@ -1,23 +1,40 @@
 package com.bezina.water_delivery.notification_service.rest;
 
-import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.http.MediaType;
+
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
+@RestController
+@RequestMapping("/notifications")
 
-//@RestController
-//@RequestMapping("/notifications")
 public class NotificationController {
+    private String user;
+    private String role;
+
+    public NotificationController() {
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
 
     // userId → emitter
     private final Map<String, SseEmitter> userEmitters = new ConcurrentHashMap<>();
@@ -25,65 +42,71 @@ public class NotificationController {
     private final Map<String, List<SseEmitter>> roleEmitters = new ConcurrentHashMap<>();
 
 
- /*   @GetMapping(path = "/notifications", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public void stream(HttpServletResponse response) throws IOException {
-        response.setContentType(MediaType.TEXT_EVENT_STREAM_VALUE);
-        response.setCharacterEncoding("UTF-8");
+    // список активных подключений
+    private final List<SseEmitter> emitters = new CopyOnWriteArrayList<>();
 
-        PrintWriter writer = response.getWriter();
-        writer.write("data: {\"msg\":\"connected\"}\n\n");
-        writer.flush();
-    }
-
-   /* @GetMapping(path = "/notifications", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter stream(@RequestHeader("X-User-Id") String userId,
-                             @RequestHeader("X-User-Role") String role) {
-
-        SseEmitter emitter = new SseEmitter(0L); // 0 = без таймаута
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
-            try {
-                emitter.send(SseEmitter.event()
-                        .name("message")
-                        .data("{\"msg\":\"ping\"}"));
-            } catch (IOException e) {
-                emitter.completeWithError(e);
-            }
-        }, 0, 10, TimeUnit.SECONDS);
-        // Лог для проверки
-        System.out.println("🔔 SSE подключился: user=" + userId + ", role=" + role);
-
-
-        return emitter;
-    }*/
-
-  /*  @GetMapping
+    @GetMapping
     public SseEmitter connect(@RequestHeader("X-User-Id") String userId,
                               @RequestHeader("X-User-Role") String role) {
+        setUser(userId);
+        setRole(role);
 
-        SseEmitter emitter = new SseEmitter(0L); // без таймаута
-        userEmitters.put(userId, emitter);
+        // создаём emitter с таймаутом (например, 30 мин)
+        SseEmitter emitter = new SseEmitter(30 * 60 * 1000L);
+        emitters.add(emitter);
 
-        roleEmitters.computeIfAbsent(role, r -> new CopyOnWriteArrayList<>()).add(emitter);
+        SseEmitter emitterUser = new SseEmitter(30 * 60 * 1000L);
+        userEmitters.put(userId, emitterUser);
 
-        emitter.onCompletion(() -> {
-            userEmitters.remove(userId);
-            roleEmitters.getOrDefault(role, List.of()).remove(emitter);
-        });
-        emitter.onTimeout(() -> {
-            userEmitters.remove(userId);
-            roleEmitters.getOrDefault(role, List.of()).remove(emitter);
-        });
-        emitter.onError(e -> {
-            userEmitters.remove(userId);
-            roleEmitters.getOrDefault(role, List.of()).remove(emitter);
-        });
 
-        // Лог для проверки
-        System.out.println("🔔 SSE подключился: user=" + userId + ", role=" + role);
+        roleEmitters.computeIfAbsent(role, r -> new CopyOnWriteArrayList<>()).add(emitterUser);
+
+
+        // удаляем emitter при закрытии/ошибке
+        emitter.onCompletion(() -> emitters.remove(emitter));
+        emitter.onTimeout(() -> emitters.remove(emitter));
+        emitter.onError(e -> emitters.remove(emitter));
+
+        emitterUser.onCompletion(() -> emitters.remove(emitterUser));
+        emitterUser.onTimeout(() -> emitters.remove(emitterUser));
+        emitterUser.onError(e -> emitters.remove(emitterUser));
+
+
+        try {
+            // сразу отправляем "connected"
+            emitter.send(SseEmitter.event().name("init").data("{\"msg\":\"connected\"}"));
+        } catch (IOException e) {
+            emitters.remove(emitter);
+        }
+        try {
+            // сразу отправляем "connected"
+            emitterUser.send(SseEmitter.event().name("first").data("{\"user\":\"user_role\"}"));
+        } catch (IOException e) {
+            userEmitters.remove(emitterUser);
+        }
 
         return emitter;
-    }*/
+    }
 
+    // пример: ручка для отправки уведомлений
+    @PostMapping("/send")
+    public void sendMessage(@RequestBody String message,
+                            @RequestHeader("X-User-Id") String userId,
+                            @RequestHeader("X-User-Role") String role) {
+        for (SseEmitter emitter : emitters) {
+            try {
+                emitter.send(SseEmitter.event().name("message").data(message));
+            } catch (IOException e) {
+                emitters.remove(emitter);
+            }
+        }
+        sendToUser(userId, Map.of(
+                "type", "NEW_ORDER",
+                "orderNo", "some order",
+                "address", "Some Address"
+        ));
+        System.out.println("📦 Sent new order notification to user " + userId);
+    }
     public void sendToUser(String userId, Object payload) {
         SseEmitter emitter = userEmitters.get(userId);
         if (emitter != null) {
@@ -109,5 +132,18 @@ public class NotificationController {
             }
         }
     }
-}
 
+    public void sendMessageFromKafka( Object payload) {
+        for (SseEmitter emitter : emitters) {
+            try {
+                emitter.send(SseEmitter.event()
+                      //  .name("message")
+                        .data(payload));
+            } catch (IOException e) {
+                emitters.remove(emitter);
+            }
+        }
+        System.out.println("📦 Sent new notification to user " + user);
+    }
+
+}

@@ -10,6 +10,7 @@ public class DeliveryStatusChangedEvent {
     private long changedAt;
 
     public DeliveryStatusChangedEvent(Long orderNo, OrderStatus status, long changedAt) {
+
         this.orderNo = orderNo;
         this.status = status;
         this.changedAt = changedAt;
@@ -17,6 +18,7 @@ public class DeliveryStatusChangedEvent {
 
     public DeliveryStatusChangedEvent() {
     }
+
 
     public Long getOrderNo() {
         return orderNo;
@@ -47,7 +49,7 @@ public class DeliveryStatusChangedEvent {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DeliveryStatusChangedEvent that = (DeliveryStatusChangedEvent) o;
-        return changedAt == that.changedAt && Objects.equals(orderNo, that.orderNo) && status == that.status;
+        return changedAt == that.changedAt  && Objects.equals(orderNo, that.orderNo) && status == that.status;
     }
 
     @Override
@@ -58,7 +60,7 @@ public class DeliveryStatusChangedEvent {
     @Override
     public String toString() {
         return "DeliveryStatusChangedEvent{" +
-                "orderId='" + orderNo + '\'' +
+                ", orderNo=" + orderNo +
                 ", status=" + status +
                 ", changedAt=" + changedAt +
                 '}';

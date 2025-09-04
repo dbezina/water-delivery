@@ -49,7 +49,7 @@ public class OrderService {
         }
         order.setUserId(userId);
         order.setAddress(address);
-        order.setStatus(OrderStatus.PENDING);
+        order.setStatus(OrderStatus.QUEUED);
 
         List<OrderItem> items = itemsDto.stream()
                 .map(dto -> {
@@ -66,7 +66,7 @@ public class OrderService {
         Order savedOrder = orderRepository.save(order);
 
         // добавляем запись в историю
-        addHistory(savedOrder, OrderStatus.PENDING);
+        addHistory(savedOrder, OrderStatus.QUEUED);
 
         return savedOrder;
     }
@@ -115,7 +115,7 @@ public class OrderService {
 
     public void confirmOrder(PaymentConfirmedEvent event) {
         orderRepository.findById(event.getOrderId()).ifPresent(order -> {
-            if (order.getStatus() == OrderStatus.PENDING) {
+            if (order.getStatus() == OrderStatus.QUEUED) {
                 order.setStatus(OrderStatus.CONFIRMED);
                 orderRepository.save(order);
 
@@ -123,7 +123,7 @@ public class OrderService {
                 OrderStatusHistory history = new OrderStatusHistory();
                 history.setOrder(order);
                 history.setStatus(OrderStatus.CONFIRMED);
-                history.setChangedAt(Instant.ofEpochMilli(event.getConfirmedAt()));
+                history.setChangedAt(Instant.now());
                 historyRepository.save(history);
 
                 // генерируем событие order.confirmed
