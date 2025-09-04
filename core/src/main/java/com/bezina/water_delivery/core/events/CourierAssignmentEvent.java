@@ -1,7 +1,7 @@
-package com.bezina.water_delivery.delivery_service.events;
+package com.bezina.water_delivery.core.events;
 
-import com.bezina.water_delivery.delivery_service.DTO.AssignmentItemDto;
-import com.bezina.water_delivery.delivery_service.entity.AssignmentItem;
+
+import com.bezina.water_delivery.core.DTO.AssignmentItemDto;
 
 import java.time.Instant;
 import java.util.List;

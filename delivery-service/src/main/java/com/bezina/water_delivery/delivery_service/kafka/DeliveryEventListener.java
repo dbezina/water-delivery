@@ -1,8 +1,7 @@
 package com.bezina.water_delivery.delivery_service.kafka;
 
-import com.bezina.water_delivery.delivery_service.events.CourierAssignmentEvent;
+import com.bezina.water_delivery.core.events.CourierAssignmentEvent;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 @Service

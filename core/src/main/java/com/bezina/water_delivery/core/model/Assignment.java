@@ -1,6 +1,7 @@
-package com.bezina.water_delivery.delivery_service.entity;
+package com.bezina.water_delivery.core.model;
 
-import com.bezina.water_delivery.delivery_service.entity.enums.AssignmentStatus;
+
+import com.bezina.water_delivery.core.model.enums.AssignmentStatus;
 import jakarta.persistence.*;
 
 import java.time.Instant;

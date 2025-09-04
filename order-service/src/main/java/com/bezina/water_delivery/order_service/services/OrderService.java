@@ -1,6 +1,7 @@
 package com.bezina.water_delivery.order_service.services;
 
 import com.bezina.water_delivery.core.DTO.OrderItemDto;
+import com.bezina.water_delivery.core.events.IsDeliveredEvent;
 import com.bezina.water_delivery.core.events.OrderConfirmedEvent;
 import com.bezina.water_delivery.core.events.PaymentConfirmedEvent;
 import com.bezina.water_delivery.core.model.OrderItem;
@@ -8,10 +9,11 @@ import com.bezina.water_delivery.core.model.OrderStatusHistory;
 
 
 import com.bezina.water_delivery.core.model.Order;
-import com.bezina.water_delivery.core.model.OrderStatus;
+import com.bezina.water_delivery.core.model.enums.OrderStatus;
 import com.bezina.water_delivery.order_service.DAO.OrderRepository;
 import com.bezina.water_delivery.order_service.DAO.OrderStatusHistoryRepository;
 import com.bezina.water_delivery.order_service.kafka.OrderEventProducer;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -92,11 +94,25 @@ public class OrderService {
 
         historyRepository.save(history);
     }
+    public void updateStatusFromDelivery(long orderNo, OrderStatus orderStatus) {
 
+        orderRepository.findByOrderNo(orderNo).ifPresent(order -> {
 
-    public void updateStatusFromCourier(String orderId, OrderStatus status) {
-        Order order =  updateStatus(orderId, status);
+            order.setStatus(orderStatus);
+            orderRepository.save(order);
+
+            // пишем в историю
+            OrderStatusHistory history = new OrderStatusHistory();
+            history.setOrder(order);
+            history.setStatus(orderStatus);
+            history.setChangedAt(Instant.now());
+            historyRepository.save(history);
+
+            System.out.println("✅ Order no" +orderNo+ " " + order.getId() + " is "+ orderStatus.name());
+
+        });
     }
+
     public void confirmOrder(PaymentConfirmedEvent event) {
         orderRepository.findById(event.getOrderId()).ifPresent(order -> {
             if (order.getStatus() == OrderStatus.PENDING) {

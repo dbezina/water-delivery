@@ -1,6 +1,6 @@
 package com.bezina.water_delivery.core.events;
 
-import com.bezina.water_delivery.core.model.OrderStatus;
+import com.bezina.water_delivery.core.model.enums.OrderStatus;
 
 import java.util.Objects;
 

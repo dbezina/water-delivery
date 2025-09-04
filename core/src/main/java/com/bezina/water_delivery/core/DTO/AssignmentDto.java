@@ -1,6 +1,8 @@
-package com.bezina.water_delivery.delivery_service.DTO;
+package com.bezina.water_delivery.core.DTO;
 
-import com.bezina.water_delivery.delivery_service.entity.Assignment;
+
+
+import com.bezina.water_delivery.core.model.Assignment;
 
 import java.time.Instant;
 import java.util.List;

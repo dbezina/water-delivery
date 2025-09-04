@@ -1,5 +1,6 @@
 package com.bezina.water_delivery.core.model;
 
+import com.bezina.water_delivery.core.model.enums.OrderStatus;
 import jakarta.persistence.*;
 
 import java.time.Instant;
@@ -14,8 +15,9 @@ public class OrderStatusHistory {
     @JoinColumn(name = "order_id")
     private Order order;
 
+
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "status", length = 50, nullable = false)
     private OrderStatus status;
 
     @Column(nullable = false)

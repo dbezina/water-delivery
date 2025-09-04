@@ -1,4 +1,4 @@
-package com.bezina.water_delivery.delivery_service.entity.enums;
+package com.bezina.water_delivery.core.model.enums;
 
 public enum AssignmentStatus {
     QUEUED,      // заявка принята

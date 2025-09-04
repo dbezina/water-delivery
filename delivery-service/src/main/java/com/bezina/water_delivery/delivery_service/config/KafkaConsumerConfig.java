@@ -1,8 +1,7 @@
 package com.bezina.water_delivery.delivery_service.config;
 
 import com.bezina.water_delivery.core.events.OrderConfirmedEvent;
-import com.bezina.water_delivery.core.events.PaymentConfirmedEvent;
-import com.bezina.water_delivery.delivery_service.events.CourierAssignmentEvent;
+import com.bezina.water_delivery.core.events.CourierAssignmentEvent;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.context.annotation.Bean;
@@ -13,7 +12,6 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
-import java.util.HashMap;
 import java.util.Map;
 @Configuration
 @EnableKafka

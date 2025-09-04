@@ -2,9 +2,9 @@ package com.bezina.water_delivery.delivery_service.rest;
 
 
 import com.bezina.water_delivery.delivery_service.DAO.AssignmentRepository;
-import com.bezina.water_delivery.delivery_service.DTO.AssignmentDto;
+import com.bezina.water_delivery.core.DTO.AssignmentDto;
 import com.bezina.water_delivery.delivery_service.DTO.CourierUpdateRequest;
-import com.bezina.water_delivery.delivery_service.entity.Assignment;
+import com.bezina.water_delivery.core.model.Assignment;
 import com.bezina.water_delivery.delivery_service.service.UpdateMessages;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -48,7 +48,7 @@ public class CourierController {
         assignment.setUpdatedAt(Instant.now());
 
         assignmentRepository.save(assignment);
-        updateService.sendUpdateStatusMessageToKafka(assignment);
+        updateService.sendIsDeliveredMessageToKafka(assignment);
        // return ResponseEntity.ok("Order " + orderNo + " updated to " + request.getStatus());
         Map<String, Object> response = new HashMap<>();
         response.put("orderNo", orderNo);

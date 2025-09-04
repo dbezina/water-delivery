@@ -2,10 +2,10 @@ package com.bezina.water_delivery.delivery_service.rest;
 
 import com.bezina.water_delivery.delivery_service.DAO.AssignmentRepository;
 import com.bezina.water_delivery.delivery_service.DTO.AssignRequest;
-import com.bezina.water_delivery.delivery_service.DTO.AssignmentDto;
+import com.bezina.water_delivery.core.DTO.AssignmentDto;
 import com.bezina.water_delivery.delivery_service.DTO.UpdateStatusRequest;
-import com.bezina.water_delivery.delivery_service.entity.Assignment;
-import com.bezina.water_delivery.delivery_service.entity.enums.AssignmentStatus;
+import com.bezina.water_delivery.core.model.Assignment;
+import com.bezina.water_delivery.core.model.enums.AssignmentStatus;
 import com.bezina.water_delivery.delivery_service.events.DeliveryAssignedEvent;
 import com.bezina.water_delivery.delivery_service.events.DeliveryStatusChangedEvent;
 import com.bezina.water_delivery.delivery_service.kafka.DeliveryEventProducer;
@@ -49,7 +49,7 @@ public class AdminDeliveryController {
         Assignment saved = assignmentRepository.save(assignment);
 
         // публикуем событие
-        eventProducer.sendDeliveryEvent(new DeliveryAssignedEvent(
+        eventProducer.sendDeliveryAssignedEvent(new DeliveryAssignedEvent(
                 saved.getOrderNo(), saved.getCourierId(),
                 saved.getDeliverFrom(), saved.getDeliverTo(),
                 saved.getStatus(), Instant.now().toEpochMilli()
@@ -80,7 +80,7 @@ public class AdminDeliveryController {
                     saved.getStatus(),
                     Instant.now().toEpochMilli()
             );
-            eventProducer.sendDeliveryEvent(event);
+            eventProducer.sendDeliveryStatusChanged(event);
 
             System.out.println("✅ DeliveryStatusChangedEvent published: orderNo="
                     + saved.getOrderNo() + ", status=" + saved.getStatus());

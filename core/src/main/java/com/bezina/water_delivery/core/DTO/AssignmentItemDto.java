@@ -1,6 +1,7 @@
-package com.bezina.water_delivery.delivery_service.DTO;
+package com.bezina.water_delivery.core.DTO;
 
-import com.bezina.water_delivery.delivery_service.entity.AssignmentItem;
+
+import com.bezina.water_delivery.core.model.AssignmentItem;
 
 public class AssignmentItemDto {
     private String size;

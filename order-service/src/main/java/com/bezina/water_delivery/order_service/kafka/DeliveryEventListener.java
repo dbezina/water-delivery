@@ -2,10 +2,11 @@ package com.bezina.water_delivery.order_service.kafka;
 
 import com.bezina.water_delivery.core.events.DeliveryStatusChangedEvent;
 import com.bezina.water_delivery.core.events.IsDeliveredEvent;
-import com.bezina.water_delivery.order_service.DAO.OrderStatusHistoryRepository;
 import com.bezina.water_delivery.core.model.OrderStatusHistory;
-import com.bezina.water_delivery.core.model.OrderStatus;
+import com.bezina.water_delivery.core.model.enums.OrderStatus;
+import com.bezina.water_delivery.order_service.DAO.OrderStatusHistoryRepository;
 import com.bezina.water_delivery.order_service.DAO.OrderRepository;
+import com.bezina.water_delivery.order_service.services.OrderService;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
@@ -15,32 +16,23 @@ import java.time.Instant;
 public class DeliveryEventListener {
     private final OrderRepository orderRepository;
     private final OrderStatusHistoryRepository historyRepository;
+    private final OrderService orderService;
 
-    public DeliveryEventListener(OrderRepository orderRepository, OrderStatusHistoryRepository historyRepository) {
+    public DeliveryEventListener(OrderRepository orderRepository, OrderStatusHistoryRepository historyRepository, OrderService orderService) {
         this.orderRepository = orderRepository;
         this.historyRepository = historyRepository;
+        this.orderService = orderService;
     }
 
     @KafkaListener(
-            topics = "delivery.events",
+            topics = "delivery.events.order-delivered",
             groupId = "order-service",
             containerFactory = "isDeliveredKafkaListenerFactory"
     )
     public void handleDelivered(IsDeliveredEvent event) {
+
+        orderService.updateStatusFromDelivery(event.getOrderNo(), OrderStatus.DELIVERED);
         System.out.println("📦 Order delivered: " + event);
-
-        orderRepository.findById(event.getOrderId()).ifPresent(order -> {
-            // обновляем статус
-            order.setStatus(OrderStatus.DELIVERED);
-            orderRepository.save(order);
-
-            // пишем в историю
-            OrderStatusHistory history = new OrderStatusHistory();
-            history.setOrder(order);
-            history.setStatus(OrderStatus.DELIVERED);
-            history.setChangedAt(Instant.ofEpochMilli(event.getDeliveredAt()));
-            historyRepository.save(history);
-        });
     }
 
     @KafkaListener(
@@ -49,17 +41,9 @@ public class DeliveryEventListener {
             containerFactory = "deliveryStatusKafkaListenerFactory"
     )
     public void handleDeliveryStatusChanged(DeliveryStatusChangedEvent event) {
+
+        orderService.updateStatusFromDelivery(event.getOrderNo(), event.getStatus());
         System.out.println("📦 Delivery status update: " + event);
 
-        orderRepository.findByOrderNo(event.getOrderNo()).ifPresent(order -> {
-            order.setStatus(event.getStatus());
-            orderRepository.save(order);
-
-            OrderStatusHistory history = new OrderStatusHistory();
-            history.setOrder(order);
-            history.setStatus(event.getStatus());
-            history.setChangedAt(Instant.ofEpochMilli(event.getChangedAt()));
-            historyRepository.save(history);
-        });
     }
 }

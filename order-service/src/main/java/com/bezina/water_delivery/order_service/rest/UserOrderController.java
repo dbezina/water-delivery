@@ -2,7 +2,7 @@ package com.bezina.water_delivery.order_service.rest;
 
 
 import com.bezina.water_delivery.core.DTO.OrderDto;
-import com.bezina.water_delivery.core.model.OrderStatus;
+import com.bezina.water_delivery.core.model.enums.OrderStatus;
 import com.bezina.water_delivery.order_service.DAO.OrderRepository;
 import org.springframework.http.ResponseEntity;
 

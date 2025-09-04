@@ -2,7 +2,7 @@ package com.bezina.water_delivery.order_service.kafka;
 
 import com.bezina.water_delivery.core.events.PaymentConfirmedEvent;
 import com.bezina.water_delivery.core.events.PaymentFailedEvent;
-import com.bezina.water_delivery.core.model.OrderStatus;
+import com.bezina.water_delivery.core.model.enums.OrderStatus;
 import com.bezina.water_delivery.core.model.OrderStatusHistory;
 import com.bezina.water_delivery.order_service.DAO.OrderRepository;
 import com.bezina.water_delivery.order_service.DAO.OrderStatusHistoryRepository;

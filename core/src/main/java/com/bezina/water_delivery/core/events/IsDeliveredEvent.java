@@ -3,23 +3,24 @@ package com.bezina.water_delivery.core.events;
 import java.util.Objects;
 
 public class IsDeliveredEvent {
-    private String orderId;
+    private Long orderNo;
     private long deliveredAt;
 
-    public IsDeliveredEvent(String orderId, long deliveredAt) {
-        this.orderId = orderId;
+
+    public IsDeliveredEvent(Long orderNo, long deliveredAt) {
+        this.orderNo = orderNo;
         this.deliveredAt = deliveredAt;
     }
 
     public IsDeliveredEvent() {
     }
 
-    public String getOrderId() {
-        return orderId;
+    public Long getOrderNo() {
+        return orderNo;
     }
 
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
+    public void setOrderNo(Long orderNo) {
+        this.orderNo = orderNo;
     }
 
     public long getDeliveredAt() {
@@ -35,18 +36,18 @@ public class IsDeliveredEvent {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         IsDeliveredEvent that = (IsDeliveredEvent) o;
-        return deliveredAt == that.deliveredAt && Objects.equals(orderId, that.orderId);
+        return deliveredAt == that.deliveredAt && Objects.equals(orderNo, that.orderNo);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(orderId, deliveredAt);
+        return Objects.hash(orderNo, deliveredAt);
     }
 
     @Override
     public String toString() {
         return "IsDeliveredEvent{" +
-                "orderId='" + orderId + '\'' +
+                "orderNo=" + orderNo +
                 ", deliveredAt=" + deliveredAt +
                 '}';
     }

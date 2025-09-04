@@ -1,5 +1,6 @@
 package com.bezina.water_delivery.core.model;
 
+import com.bezina.water_delivery.core.model.enums.OrderStatus;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ public class Order {
     @Column(nullable = false)
     private String address;
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "status", length = 50, nullable = false)
     private OrderStatus status = OrderStatus.PENDING; // по умолчанию
 
     @Column

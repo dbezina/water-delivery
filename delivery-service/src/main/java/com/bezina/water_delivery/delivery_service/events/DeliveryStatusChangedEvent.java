@@ -1,6 +1,6 @@
 package com.bezina.water_delivery.delivery_service.events;
 
-import com.bezina.water_delivery.delivery_service.entity.enums.AssignmentStatus;
+import com.bezina.water_delivery.core.model.enums.AssignmentStatus;
 
 import java.util.Objects;
 

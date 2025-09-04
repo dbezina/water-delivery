@@ -1,13 +1,12 @@
 package com.bezina.water_delivery.delivery_service.service;
 
-import com.bezina.water_delivery.delivery_service.events.CourierAssignmentEvent;
 import com.bezina.water_delivery.core.events.OrderConfirmedEvent;
 import com.bezina.water_delivery.delivery_service.DAO.AssignmentDetailsRepository;
 import com.bezina.water_delivery.delivery_service.DAO.AssignmentRepository;
-import com.bezina.water_delivery.delivery_service.entity.Assignment;
-import com.bezina.water_delivery.delivery_service.entity.AssignmentDetails;
-import com.bezina.water_delivery.delivery_service.entity.AssignmentItem;
-import com.bezina.water_delivery.delivery_service.entity.enums.AssignmentStatus;
+import com.bezina.water_delivery.core.model.Assignment;
+import com.bezina.water_delivery.core.model.AssignmentDetails;
+import com.bezina.water_delivery.core.model.AssignmentItem;
+import com.bezina.water_delivery.core.model.enums.AssignmentStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

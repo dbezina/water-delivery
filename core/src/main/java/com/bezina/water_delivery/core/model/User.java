@@ -1,5 +1,6 @@
 package com.bezina.water_delivery.core.model;
 
+import com.bezina.water_delivery.core.model.enums.Role;
 import jakarta.persistence.*;
 
 @Entity
