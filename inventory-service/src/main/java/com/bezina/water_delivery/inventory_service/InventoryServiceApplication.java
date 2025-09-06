@@ -8,8 +8,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @SpringBootApplication
 @EnableJpaRepositories(basePackages = "com.bezina.water_delivery.inventory_service.DAO")
 @EntityScan(basePackages = {
-		"com.bezina.water_delivery.core"
-		,"com.bezina.water_delivery.inventory_service"
+		//"com.bezina.water_delivery.core",
+		"com.bezina.water_delivery.inventory_service"
 })
 public class InventoryServiceApplication {
 

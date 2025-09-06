@@ -1,8 +1,7 @@
 package com.bezina.water_delivery.core.events;
 
 import com.bezina.water_delivery.core.DTO.OrderItemDto;
-import com.bezina.water_delivery.core.model.Order;
-import com.bezina.water_delivery.core.model.OrderItem;
+import com.bezina.water_delivery.core.model.orders.Order;
 
 import java.time.Instant;
 import java.util.List;

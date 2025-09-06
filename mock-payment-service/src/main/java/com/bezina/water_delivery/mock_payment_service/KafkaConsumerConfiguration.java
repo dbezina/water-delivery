@@ -4,6 +4,7 @@ package com.bezina.water_delivery.mock_payment_service;
 import com.bezina.water_delivery.core.events.OrderCreatedEvent;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
@@ -15,6 +16,8 @@ import java.util.Map;
 
 @Configuration
 public class KafkaConsumerConfiguration {
+    @Value("${spring.kafka.bootstrap-servers}")
+    private String bootstrapServers;
 
     @Bean
     public ConsumerFactory<String, OrderCreatedEvent> orderCreatedConsumerFactory() {
@@ -23,7 +26,7 @@ public class KafkaConsumerConfiguration {
         deserializer.addTrustedPackages("*");
 
         return new DefaultKafkaConsumerFactory<>(
-                Map.of(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092",
+                Map.of(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers,
                         ConsumerConfig.GROUP_ID_CONFIG, "payment-service",
                         ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest"),
                 new StringDeserializer(),

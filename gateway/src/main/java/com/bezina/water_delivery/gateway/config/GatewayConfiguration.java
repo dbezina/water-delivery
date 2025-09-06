@@ -3,6 +3,7 @@ package com.bezina.water_delivery.gateway.config;
 import com.bezina.water_delivery.gateway.Security.JwtAuthFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
@@ -20,6 +21,21 @@ import java.util.List;
 @Configuration
 public class GatewayConfiguration {
 
+    @Value("${services.auth-service}")
+    private String authServiceUri;
+
+    @Value("${services.order-service}")
+    private String orderServiceUri;
+
+    @Value("${services.delivery-service}")
+    private String deliveryServiceUri;
+
+    @Value("${services.inventory-service}")
+    private String inventoryServiceUri;
+
+    @Value("${services.notification-service}")
+    private String notificationServiceUri;
+
         private static final Logger LOGGER = LoggerFactory.getLogger(GatewayConfiguration.class);
         private final JwtAuthFilter jwtAuthFilter;
 
@@ -27,32 +43,55 @@ public class GatewayConfiguration {
         this.jwtAuthFilter = jwtAuthFilter;
     }
 
-    @Bean
-        public RouteLocator routes(RouteLocatorBuilder builder) {
-            LOGGER.info("RouteLocator configured");
+//    @Bean
+//        public RouteLocator routes(RouteLocatorBuilder builder) {
+//            LOGGER.info("RouteLocator configured");
+//
+//            return builder.routes()
+//                    .route("auth-service", r -> r.path("/auth/**")
+//                            .uri("http://auth-service:8081"))
+//
+//                    .route("orders", r -> r.path("/user/**")
+//                            .uri("http://order-service:8082"))
+//                    .route("delivery-admin", r -> r.path("/admin/delivery/**")
+//                            .uri("http://delivery-service:8083"))
+//                    .route("delivery-courier", r -> r.path("/courier/**")
+//                            .uri("http://delivery-service:8083"))
+//                    .route("admin-inventory", r -> r.path("/admin/inventory/**")
+//                            .filters(f -> f
+//                                    .stripPrefix(1) // удаляет первый сегмент пути "/admin"
+//                            )
+//                            .uri("http://inventory-service:8084"))
+//                /*    .route("payment", r -> r.path("/payment/**")
+//                            .uri("http://payment-service:8085"))*/
+//                    .route("notifications", r -> r.path("/notifications/**")
+//                            .uri("http://notification-service:8086"))
+//                    .build();
+//        }
+@Bean
+public RouteLocator routes(RouteLocatorBuilder builder) {
+    LOGGER.info("RouteLocator configured");
 
-            return builder.routes()
-                    .route("auth-service", r -> r.path("/auth/**")
-                            .uri("http://localhost:8081"))
-
-                    .route("orders", r -> r.path("/user/**")
-                            .uri("http://localhost:8082"))
-                    .route("delivery-admin", r -> r.path("/admin/delivery/**")
-                            .uri("http://localhost:8083"))
-                    .route("delivery-courier", r -> r.path("/courier/**")
-                            .uri("http://localhost:8083"))
-                    .route("admin-inventory", r -> r.path("/admin/inventory/**")
-                            .filters(f -> f
-                                    .stripPrefix(1) // удаляет первый сегмент пути "/admin"
-                            )
-                            .uri("http://localhost:8084"))
-                /*    .route("payment", r -> r.path("/payment/**")
-                            .uri("http://localhost:8085"))*/
-                    .route("notifications", r -> r.path("/notifications/**")
-                            .uri("http://localhost:8086"))
-                    .build();
-        }
-
+    return builder.routes()
+            .route("auth-service", r -> r.path("/auth/**")
+                    .uri(authServiceUri))
+            .route("orders", r -> r.path("/user/**")
+                    .uri(orderServiceUri))
+            .route("delivery-admin", r -> r.path("/admin/delivery/**")
+                    .uri(deliveryServiceUri))
+            .route("delivery-courier", r -> r.path("/courier/**")
+                    .uri(deliveryServiceUri))
+            .route("admin-inventory", r -> r.path("/admin/inventory/**")
+                    .filters(f -> f
+                            .stripPrefix(1) // удаляет первый сегмент пути "/admin"
+                    )
+                    .uri(inventoryServiceUri))
+            /*    .route("payment", r -> r.path("/payment/**")
+                        .uri("http://payment-service:8085"))*/
+            .route("notifications", r -> r.path("/notifications/**")
+                    .uri(notificationServiceUri))
+            .build();
+}
         @Bean
         public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
             return http
@@ -77,14 +116,14 @@ public class GatewayConfiguration {
 
         // Укажите один конкретный домен, для которого разрешены запросы
         // Замените "https://ваш-адрес.com" на реальный URL
-        config.setAllowedOrigins(List.of("http://127.0.0.1:5500"));
+        config.setAllowedOrigins(List.of("http://127.0.0.1:5500", "http://localhost:3000"));
 
         // Разрешить отправку учетных данных (если необходимо)
         config.setAllowCredentials(true);
 
         // Примените конфигурацию для всех путей приложения
         source.registerCorsConfiguration("/**", config);
-        System.out.println("size "+List.of("http://127.0.0.1:5500").size());
+        System.out.println("size "+List.of("http://127.0.0.1:5500", "http://localhost:3000").size());
         System.out.println(config.getAllowedOrigins().size());
         return source;
     }

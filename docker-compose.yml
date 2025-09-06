@@ -1,0 +1,140 @@
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.0
+    container_name: zookeeper-water
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: kafka-water
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    depends_on:
+      - zookeeper
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-water
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: water_delivery_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    volumes:
+      - ./data:/var/lib/mysql
+    restart: always
+
+  gateway:
+    build:
+      context: ./gateway
+    container_name: gateway
+    ports:
+      - "8089:8089"
+    environment:
+      - MYSQL_HOST=host.docker.internal
+      - KAFKA_HOST=kafka
+    depends_on:
+      - auth-service
+      - order-service
+      - inventory-service
+      - notification-service
+      - delivery-service
+      - mock-payment-service
+
+  auth-service:
+    build:
+      context: ./auth-service
+    container_name: auth-service
+    environment:
+      - MYSQL_HOST=host.docker.internal
+      - KAFKA_HOST=kafka
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_DATABASE=inventory_db
+      - MYSQL_USER=bestuser
+      - MYSQL_PASSWORD=bestuser
+    depends_on:
+      - kafka
+
+  order-service:
+    build:
+      context: ./order-service
+    container_name: order-service
+    environment:
+      - MYSQL_HOST=host.docker.internal
+      - KAFKA_HOST=kafka
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_DATABASE=orders_db
+      - MYSQL_USER=bestuser
+      - MYSQL_PASSWORD=bestuser
+    depends_on:
+      - kafka
+
+  inventory-service:
+    build:
+      context: ./inventory-service
+    container_name: inventory-service
+    environment:
+      - MYSQL_HOST=host.docker.internal
+      - KAFKA_HOST=kafka
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_DATABASE=inventory_db
+      - MYSQL_USER=bestuser
+      - MYSQL_PASSWORD=bestuser
+    depends_on:
+      - kafka
+
+  notification-service:
+    build:
+      context: ./notification-service
+    container_name: notification-service
+    environment:
+      - KAFKA_HOST=kafka
+    depends_on:
+      - kafka
+
+  delivery-service:
+    build:
+      context: ./delivery-service
+    container_name: delivery-service
+    environment:
+      - MYSQL_HOST=host.docker.internal
+      - KAFKA_HOST=kafka
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_DATABASE=delivery_db
+      - MYSQL_USER=bestuser
+      - MYSQL_PASSWORD=bestuser
+    depends_on:
+      - kafka
+
+  mock-payment-service:
+    build:
+      context: ./mock-payment-service
+    container_name: mock-payment-service
+    environment:
+      - MYSQL_HOST=host.docker.internal
+      - KAFKA_HOST=kafka
+    depends_on:
+      - kafka
+
+  frontend:
+    image: water-app-frontend:latest
+    container_name: water-frontend
+    ports:
+      - "3000:80"
+    environment:
+      - API_URL=http://gateway:8089
+
+volumes:
+   mysql_data:

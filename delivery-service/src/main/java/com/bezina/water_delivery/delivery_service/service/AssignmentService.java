@@ -4,9 +4,9 @@ import com.bezina.water_delivery.core.events.OrderConfirmedEvent;
 import com.bezina.water_delivery.core.model.enums.OrderStatus;
 import com.bezina.water_delivery.delivery_service.DAO.AssignmentDetailsRepository;
 import com.bezina.water_delivery.delivery_service.DAO.AssignmentRepository;
-import com.bezina.water_delivery.core.model.Assignment;
-import com.bezina.water_delivery.core.model.AssignmentDetails;
-import com.bezina.water_delivery.core.model.AssignmentItem;
+import com.bezina.water_delivery.core.model.assignment.Assignment;
+import com.bezina.water_delivery.core.model.assignment.AssignmentDetails;
+import com.bezina.water_delivery.core.model.assignment.AssignmentItem;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

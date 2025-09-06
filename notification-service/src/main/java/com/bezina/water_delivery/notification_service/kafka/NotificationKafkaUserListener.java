@@ -27,8 +27,8 @@ public class NotificationKafkaUserListener {
                 Map.of(
                         "msg", "Order # "+  event.getOrderId()+ " is CONFIRMED now"
                 )
-
         );
+
         System.out.println("✅ Sent order confirmed notification to user " + event.toString());
     }
 

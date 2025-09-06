@@ -1,0 +1,10 @@
+version: "3.9"
+
+services:
+  frontend:
+    image: water-app-frontend:latest
+    container_name: water-frontend
+    ports:
+      - "3000:80"
+    environment:
+      - API_URL=http://192.168.100.12:8089

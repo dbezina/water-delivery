@@ -6,7 +6,7 @@ import com.bezina.water_delivery.delivery_service.DAO.AssignmentRepository;
 import com.bezina.water_delivery.delivery_service.DTO.AssignRequest;
 import com.bezina.water_delivery.core.DTO.AssignmentDto;
 import com.bezina.water_delivery.delivery_service.DTO.UpdateStatusRequest;
-import com.bezina.water_delivery.core.model.Assignment;
+import com.bezina.water_delivery.core.model.assignment.Assignment;
 import com.bezina.water_delivery.delivery_service.events.DeliveryAssignedEvent;
 import com.bezina.water_delivery.delivery_service.kafka.DeliveryEventProducer;
 import org.springframework.http.HttpStatus;
@@ -109,7 +109,7 @@ public class AdminDeliveryController {
     public ResponseEntity<List<AssignmentDto>> getAllAssignments(@RequestHeader("X-User-Id") String userId,
                                                                  @RequestHeader("X-User-Role") String role) {
         if ("ROLE_ADMIN".equals(role)) {
-            List<AssignmentDto> dtos = assignmentRepository.findAll()
+            List<AssignmentDto> dtos = assignmentRepository.findAllByOrderByUpdatedAtDesc()
                     .stream()
                     .map(AssignmentDto::fromEntity)
                     .toList();

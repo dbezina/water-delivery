@@ -7,7 +7,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
 @EnableJpaRepositories(basePackages = "com.bezina.water_delivery.delivery_service.DAO")
-@EntityScan(basePackages = "com.bezina.water_delivery.core")
+@EntityScan(basePackages = {
+		"com.bezina.water_delivery.core.model.assignment",
+		"com.bezina.water_delivery.core.model.enums"
+})
 public class DeliveryServiceApplication {
 
 	public static void main(String[] args) {

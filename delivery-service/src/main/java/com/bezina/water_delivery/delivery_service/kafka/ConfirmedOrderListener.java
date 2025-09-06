@@ -3,7 +3,7 @@ package com.bezina.water_delivery.delivery_service.kafka;
 import com.bezina.water_delivery.core.DTO.AssignmentItemDto;
 import com.bezina.water_delivery.core.events.CourierAssignmentEvent;
 import com.bezina.water_delivery.core.events.OrderConfirmedEvent;
-import com.bezina.water_delivery.core.model.Assignment;
+import com.bezina.water_delivery.core.model.assignment.Assignment;
 import com.bezina.water_delivery.delivery_service.service.AssignmentService;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;

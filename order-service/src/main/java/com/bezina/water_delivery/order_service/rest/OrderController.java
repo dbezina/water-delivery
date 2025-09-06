@@ -2,7 +2,7 @@ package com.bezina.water_delivery.order_service.rest;
 
 import com.bezina.water_delivery.core.DTO.OrderDto;
 import com.bezina.water_delivery.core.events.OrderCreatedEvent;
-import com.bezina.water_delivery.core.model.Order;
+import com.bezina.water_delivery.core.model.orders.Order;
 
 import com.bezina.water_delivery.order_service.DAO.OrderRepository;
 import com.bezina.water_delivery.order_service.DAO.OrderStatusHistoryRepository;

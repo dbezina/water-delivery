@@ -1,11 +1,12 @@
 package com.bezina.water_delivery.delivery_service.rest;
 
 
+import com.bezina.water_delivery.core.model.enums.OrderStatus;
 import com.bezina.water_delivery.delivery_service.DAO.AssignmentRepository;
 import com.bezina.water_delivery.core.DTO.AssignmentDto;
 import com.bezina.water_delivery.delivery_service.DTO.CourierUpdateRequest;
-import com.bezina.water_delivery.core.model.Assignment;
-import com.bezina.water_delivery.delivery_service.service.UpdateMessages;
+import com.bezina.water_delivery.core.model.assignment.Assignment;
+import com.bezina.water_delivery.delivery_service.service.UpdateService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +22,9 @@ import java.util.Map;
 public class CourierController {
 
     private final AssignmentRepository assignmentRepository;
-    private final UpdateMessages updateService;
+    private final UpdateService updateService;
 
-    public CourierController(AssignmentRepository assignmentRepository, UpdateMessages updateService) {
+    public CourierController(AssignmentRepository assignmentRepository, UpdateService updateService) {
         this.assignmentRepository = assignmentRepository;
         this.updateService = updateService;
     }
@@ -47,9 +48,11 @@ public class CourierController {
         assignment.setStatus(request.getStatus());
         assignment.setUpdatedAt(Instant.now());
 
-        assignmentRepository.save(assignment);
-        updateService.sendIsDeliveredMessageToKafka(assignment);
-       // return ResponseEntity.ok("Order " + orderNo + " updated to " + request.getStatus());
+        Assignment saved = assignmentRepository.save(assignment);
+        if (saved.getStatus() == OrderStatus.DELIVERED)
+            updateService.sendIsDeliveredMessageToKafka(saved);
+        else updateService.sendIsStatusChangedToKafka(saved);
+
         Map<String, Object> response = new HashMap<>();
         response.put("orderNo", orderNo);
         response.put("status", request.getStatus());
@@ -60,7 +63,7 @@ public class CourierController {
     public ResponseEntity<List<AssignmentDto>> getAllAssignments(@RequestHeader("X-User-Id") String userId,
                                                                 @RequestHeader("X-User-Role") String role) {
         if ("ROLE_COURIER".equals(role)) {
-            List<AssignmentDto> dtos = assignmentRepository.findAllByCourierId(userId)
+            List<AssignmentDto> dtos = assignmentRepository.findAllByCourierIdOrderByUpdatedAtDesc(userId)
                     .stream()
                     .map(AssignmentDto::fromEntity)
                     .toList();

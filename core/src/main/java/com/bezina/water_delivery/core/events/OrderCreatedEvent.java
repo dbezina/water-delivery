@@ -3,7 +3,6 @@ package com.bezina.water_delivery.core.events;
 
 
 import com.bezina.water_delivery.core.DTO.OrderItemDto;
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.Instant;
 import java.util.List;

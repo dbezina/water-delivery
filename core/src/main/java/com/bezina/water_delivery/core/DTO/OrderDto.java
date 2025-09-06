@@ -1,6 +1,6 @@
 package com.bezina.water_delivery.core.DTO;
 
-import com.bezina.water_delivery.core.model.Order;
+import com.bezina.water_delivery.core.model.orders.Order;
 import com.bezina.water_delivery.core.model.enums.OrderStatus;
 
 import java.util.List;

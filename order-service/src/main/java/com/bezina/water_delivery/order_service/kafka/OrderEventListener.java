@@ -2,7 +2,7 @@ package com.bezina.water_delivery.order_service.kafka;
 
 import com.bezina.water_delivery.core.events.StockInsufficientEvent;
 import com.bezina.water_delivery.order_service.DAO.OrderStatusHistoryRepository;
-import com.bezina.water_delivery.core.model.OrderStatusHistory;
+import com.bezina.water_delivery.core.model.orders.OrderStatusHistory;
 import com.bezina.water_delivery.core.model.enums.OrderStatus;
 import com.bezina.water_delivery.order_service.DAO.OrderRepository;
 import org.springframework.kafka.annotation.KafkaListener;

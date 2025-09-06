@@ -2,7 +2,7 @@ package com.bezina.water_delivery.core.DTO;
 
 
 
-import com.bezina.water_delivery.core.model.Assignment;
+import com.bezina.water_delivery.core.model.assignment.Assignment;
 
 import java.time.Instant;
 import java.util.List;

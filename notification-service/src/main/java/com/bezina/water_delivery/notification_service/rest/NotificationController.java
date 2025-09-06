@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,11 +38,12 @@ public class NotificationController {
         this.role = role;
     }
 
-    // userId → emitter
-    private final Map<String, SseEmitter> userEmitters = new ConcurrentHashMap<>();
+
     // role → список emitters
     private final Map<String, List<SseEmitter>> roleEmitters = new ConcurrentHashMap<>();
 
+    // ключ — userId, значение — список SSE для этого пользователя
+    private final Map<String, List<SseEmitter>> userEmitters = new ConcurrentHashMap<>();
 
     // список активных подключений
     private final List<SseEmitter> emitters = new CopyOnWriteArrayList<>();
@@ -56,7 +59,7 @@ public class NotificationController {
         emitters.add(emitter);
 
         SseEmitter emitterUser = new SseEmitter(30 * 60 * 1000L);
-        userEmitters.put(userId, emitterUser);
+       // userEmitters.put(userId, emitterUser);
 
 
         roleEmitters.computeIfAbsent(role, r -> new CopyOnWriteArrayList<>()).add(emitterUser);
@@ -88,6 +91,33 @@ public class NotificationController {
         return emitter;
     }
 
+
+    public SseEmitter subscribe(String userId) {
+        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
+        userEmitters.computeIfAbsent(userId, k -> new ArrayList<>()).add(emitter);
+
+        emitter.onCompletion(() -> userEmitters.get(userId).remove(emitter));
+        emitter.onTimeout(() -> userEmitters.get(userId).remove(emitter));
+
+        return emitter;
+    }
+//    public void sendMessageToUser(String userId, Object payload) {
+//        List<SseEmitter> userEmitters = emitters.get(userId);
+//        if (userEmitters == null) return;
+//
+//        Iterator<SseEmitter> it = userEmitters.iterator();
+//        while (it.hasNext()) {
+//            SseEmitter emitter = it.next();
+//            try {
+//                emitter.send(SseEmitter.event().data(payload));
+//            } catch (IOException e) {
+//                it.remove(); // удаляем нерабочий SSE
+//            }
+//        }
+//
+//        System.out.println("📦 Sent new notification to user " + userId);
+//    }
+
     // пример: ручка для отправки уведомлений
     @PostMapping("/send")
     public void sendMessage(@RequestBody String message,
@@ -100,25 +130,22 @@ public class NotificationController {
                 emitters.remove(emitter);
             }
         }
-        sendToUser(userId, Map.of(
-                "type", "NEW_ORDER",
-                "orderNo", "some order",
-                "address", "Some Address"
-        ));
+
         System.out.println("📦 Sent new order notification to user " + userId);
     }
-    public void sendToUser(String userId, Object payload) {
-        SseEmitter emitter = userEmitters.get(userId);
-        if (emitter != null) {
-            try {
-                emitter.send(SseEmitter.event()
-                        .name("message")
-                        .data(payload));
-            } catch (IOException e) {
-                userEmitters.remove(userId);
-            }
-        }
-    }
+
+//    public void sendToUser(String userId, Object payload) {
+//        SseEmitter emitter = userEmitters.get(userId);
+//        if (emitter != null) {
+//            try {
+//                emitter.send(SseEmitter.event()
+//                        .name("message")
+//                        .data(payload));
+//            } catch (IOException e) {
+//                userEmitters.remove(userId);
+//            }
+//        }
+//    }
 
     public void sendToRole(String role, Object payload) {
         List<SseEmitter> emitters = roleEmitters.getOrDefault(role, List.of());
@@ -144,6 +171,23 @@ public class NotificationController {
             }
         }
         System.out.println("📦 Sent new notification to user " + user);
+    //    sendMessageToUser(payload);
+    }
+    public void sendMessageToUser( Object payload) {
+        List<SseEmitter> userEm = userEmitters.get(this.getUser());
+        if (userEm == null) return;
+
+        Iterator<SseEmitter> it = userEm.iterator();
+        while (it.hasNext()) {
+            SseEmitter emitter = it.next();
+            try {
+                emitter.send(SseEmitter.event().data(payload));
+            } catch (IOException e) {
+                it.remove(); // удаляем нерабочий SSE
+            }
+        }
+
+        System.out.println("sendMessageToUser is working " + this.getUser());
     }
 
 }

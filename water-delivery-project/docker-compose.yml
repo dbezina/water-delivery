@@ -1,0 +1,138 @@
+services:
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: kafka-water
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://kafka:9092,CONTROLLER://kafka:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_NUM_PARTITIONS: 3
+      CLUSTER_ID: ttcDgvZNSeuOknCbv6TOAQ
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-wt
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: water_delivery_db
+      MYSQL_USER: bestuser
+      MYSQL_PASSWORD: bestuser
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./water_data.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: always
+
+  gateway:
+    image: water-delivery-gateway:latest
+    container_name: gateway
+    #    ports:
+    #      - "8089:8089"
+    environment:
+      - KAFKA_HOST=kafka
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - SPRING_PROFILES_ACTIVE=docker
+
+
+
+  auth-service:
+    image: water-delivery-auth-service:latest
+    container_name: auth-service
+    env_file:
+      - .env
+    environment:
+      - KAFKA_HOST=kafka
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    depends_on:
+      mysql:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    restart: on-failure
+
+  order-service:
+    image: water-delivery-order-service:latest
+    container_name: order-service
+    env_file:
+      - .env
+    environment:
+      - KAFKA_HOST=kafka
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    depends_on:
+      - kafka
+    restart: on-failure
+
+  inventory-service:
+    image: water-delivery-inventory-service:latest
+    container_name: inventory-service
+    env_file:
+      - .env
+    environment:
+      - KAFKA_HOST=kafka
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    depends_on:
+      - kafka
+    restart: on-failure
+
+  notification-service:
+    image: water-delivery-notification-service:latest
+    container_name: notification-service
+    environment:
+      - KAFKA_HOST=kafka
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    depends_on:
+      - kafka
+    restart: on-failure
+
+  delivery-service:
+    image: water-delivery-delivery-service:latest
+    container_name: delivery-service
+    env_file:
+      - .env
+    environment:
+      - KAFKA_HOST=kafka
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    depends_on:
+      - kafka
+    restart: on-failure
+
+  mock-payment-service:
+    image: water-delivery-mock-payment-service:latest
+    container_name: mock-payment-service
+    environment:
+      - KAFKA_HOST=kafka
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    depends_on:
+      - kafka
+    restart: on-failure
+
+  frontend:
+    image: water-app-frontend:latest
+    container_name: water-frontend
+    ports:
+      - "3000:80"
+    volumes:
+      # свой конфиг nginx
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - gateway
+    restart: on-failure
+
+volumes:
+  mysql_data:

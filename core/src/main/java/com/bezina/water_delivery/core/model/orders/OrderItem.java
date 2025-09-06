@@ -1,4 +1,4 @@
-package com.bezina.water_delivery.core.model;
+package com.bezina.water_delivery.core.model.orders;
 
 
 import jakarta.persistence.*;
