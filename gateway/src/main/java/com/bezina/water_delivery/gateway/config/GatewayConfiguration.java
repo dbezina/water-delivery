@@ -102,6 +102,7 @@ public RouteLocator routes(RouteLocatorBuilder builder) {
                             .anyExchange().authenticated()
                     )
                     .addFilterAt(jwtAuthFilter, SecurityWebFiltersOrder.AUTHENTICATION)
+
                     .build();
         }
     @Bean

@@ -1,4 +1,4 @@
-package com.bezina.water_delivery.inventory_service.events;
+package com.bezina.water_delivery.core.events;
 
 import com.bezina.water_delivery.core.DTO.OrderItemDto;
 
@@ -8,6 +8,7 @@ import java.util.Objects;
 
 public class StockReservedEvent {
     private String orderId;
+    private Long orderNo;
     private String userId;
     private List<OrderItemDto> items;
     private String address;
@@ -16,8 +17,9 @@ public class StockReservedEvent {
     public StockReservedEvent() {
     }
 
-    public StockReservedEvent(String orderId, String userId, List<OrderItemDto> items, String address, Instant createdAt) {
+    public StockReservedEvent(String orderId,  Long orderNo, String userId, List<OrderItemDto> items, String address, Instant createdAt) {
         this.orderId = orderId;
+        this.orderNo = orderNo;
         this.userId = userId;
         this.items = items;
         this.address = address;
@@ -64,23 +66,32 @@ public class StockReservedEvent {
         this.createdAt = createdAt;
     }
 
+    public Long getOrderNo() {
+        return orderNo;
+    }
+
+    public void setOrderNo(Long orderNo) {
+        this.orderNo = orderNo;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         StockReservedEvent that = (StockReservedEvent) o;
-        return createdAt == that.createdAt && Objects.equals(orderId, that.orderId) && Objects.equals(userId, that.userId) && Objects.equals(items, that.items) && Objects.equals(address, that.address);
+        return Objects.equals(orderId, that.orderId) && Objects.equals(orderNo, that.orderNo) && Objects.equals(userId, that.userId) && Objects.equals(items, that.items) && Objects.equals(address, that.address) && Objects.equals(createdAt, that.createdAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(orderId, userId, items, address, createdAt);
+        return Objects.hash(orderId, orderNo, userId, items, address, createdAt);
     }
 
     @Override
     public String toString() {
         return "StockReservedEvent{" +
                 "orderId='" + orderId + '\'' +
+                ", orderNo=" + orderNo +
                 ", userId='" + userId + '\'' +
                 ", items=" + items +
                 ", address='" + address + '\'' +

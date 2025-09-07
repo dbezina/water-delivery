@@ -30,7 +30,7 @@ public class NotificationKafkaAdminListener {
 
         System.out.println("✅ Admin received confirmed order: " + event.getOrderNo());
     }
-  /*  @KafkaListener(
+    @KafkaListener(
             topics = "admin.low_stock",
             groupId = "notification-service",
             containerFactory = "lowStockKafkaListenerFactory")
@@ -38,10 +38,10 @@ public class NotificationKafkaAdminListener {
 
         notificationController.sendMessageFromKafka(  Map.of(
                 "msg", "There are no more "+  event.getSize()+
-                        " in stock ,please order more " )
+                        " in stock, please order more " )
         );
 
-        System.out.println("✅ Admin received stockeLittleGoods : " + event.getSize());
-    }*/
+        System.out.println("✅ Admin received lowStockEvent: " + event.getSize());
+    }
 
 }

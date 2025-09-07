@@ -32,7 +32,7 @@ services:
       - mysql_data:/var/lib/mysql
       - ./water_data.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-uroot", "-proot"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -48,8 +48,7 @@ services:
       - KAFKA_HOST=kafka
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
       - SPRING_PROFILES_ACTIVE=docker
-
-
+      - JWT_SECRET=${JWT_SECRET}
 
   auth-service:
     image: water-delivery-auth-service:latest
@@ -59,6 +58,7 @@ services:
     environment:
       - KAFKA_HOST=kafka
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - JWT_SECRET=${JWT_SECRET}
     depends_on:
       mysql:
         condition: service_healthy

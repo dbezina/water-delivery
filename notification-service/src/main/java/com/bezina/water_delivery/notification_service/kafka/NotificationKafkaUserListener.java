@@ -81,7 +81,7 @@ public class NotificationKafkaUserListener {
             containerFactory = "stockInsufficientKafkaListenerFactory"
     )
     public void handleStockInsufficientEvent(StockInsufficientEvent event) {
-        System.out.println(" Order cancelled due to insufficient quantity: " + event.getOrderNo());
+        System.out.println("❌ Order cancelled due to insufficient quantity: " + event.getOrderNo());
         notificationController.sendMessageFromKafka(  Map.of(
                         "msg", "Order # "+  event.getOrderNo()+
                                 "cancelled due to  " +event.getReason()

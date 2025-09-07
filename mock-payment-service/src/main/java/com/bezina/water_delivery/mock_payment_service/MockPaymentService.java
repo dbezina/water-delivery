@@ -3,6 +3,7 @@ package com.bezina.water_delivery.mock_payment_service;
 import com.bezina.water_delivery.core.events.OrderCreatedEvent;
 import com.bezina.water_delivery.core.events.PaymentConfirmedEvent;
 import com.bezina.water_delivery.core.events.PaymentFailedEvent;
+import com.bezina.water_delivery.core.events.StockReservedEvent;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -17,13 +18,13 @@ public class MockPaymentService {
     }
 
     @KafkaListener(
-            topics = "orders.order_created",
+            topics = "inventory.stock_reserved",
             groupId = "payment-service",
-            containerFactory = "orderCreatedKafkaListenerFactory")
-    public void handleNewOrder(OrderCreatedEvent event) {
+            containerFactory = "stockReservedKafkaListenerFactory")
+    public void handleStockReserved(StockReservedEvent event) {
         // Эмулируем оплату
         boolean paymentOk = Math.random() > 0.3; // 70% успеха
-
+     //   boolean paymentOk = false;
         if (paymentOk) {
             PaymentConfirmedEvent confirmed = new PaymentConfirmedEvent(
                     event.getOrderId(),
