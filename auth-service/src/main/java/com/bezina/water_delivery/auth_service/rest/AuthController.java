@@ -83,6 +83,6 @@ public class AuthController {
         // генерим токен
         String token = jwtService.generateToken(userDetails);
 
-        return ResponseEntity.ok(new AuthResponse(token, role));
+        return ResponseEntity.ok(new AuthResponse(token, role, request.getUsername()));
     }
 }

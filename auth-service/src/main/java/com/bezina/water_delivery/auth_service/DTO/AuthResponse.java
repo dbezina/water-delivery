@@ -8,9 +8,12 @@ public class AuthResponse {
     private String token;
     private String userRole;
 
-    public AuthResponse(String token, String userRole) {
+    private String userName;
+
+    public AuthResponse(String token, String userRole, String userName) {
         this.token = token;
         this.userRole = userRole;
+        this.userName = userName;
     }
 
     public AuthResponse() {
@@ -32,24 +35,33 @@ public class AuthResponse {
         this.userRole = userRole;
     }
 
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AuthResponse that = (AuthResponse) o;
-        return Objects.equals(token, that.token) && userRole == that.userRole;
+        return Objects.equals(token, that.token) && Objects.equals(userRole, that.userRole) && Objects.equals(userName, that.userName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(token, userRole);
+        return Objects.hash(token, userRole, userName);
     }
 
     @Override
     public String toString() {
         return "AuthResponse{" +
                 "token='" + token + '\'' +
-                ", userRole=" + userRole +
+                ", userRole='" + userRole + '\'' +
+                ", userName='" + userName + '\'' +
                 '}';
     }
 }
