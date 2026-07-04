@@ -3,8 +3,12 @@ package com.bezina.water_delivery.auth_service.entity;
 import com.bezina.water_delivery.auth_service.entity.enums.Role;
 import jakarta.persistence.*;
 
+
+@Table(name = "users",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = "username")
+        })
 @Entity
-@Table(name = "users")
 public class User {
       @Id
       @GeneratedValue(strategy = GenerationType.UUID)
