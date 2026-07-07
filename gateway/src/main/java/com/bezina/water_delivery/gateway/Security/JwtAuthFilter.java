@@ -1,7 +1,11 @@
 package com.bezina.water_delivery.gateway.Security;
 
+import com.bezina.water_delivery.gateway.config.GatewayConfiguration;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -16,66 +20,6 @@ import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-//@Component
-//public class JwtAuthFilter implements WebFilter {
-//     private final JwtService jwtService;
-//
-//     public JwtAuthFilter(JwtService jwtService) {
-//         this.jwtService = jwtService;
-//     }
-//
-//     @Override
-//     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-//         String path = exchange.getRequest().getPath().toString();
-//         if (path.startsWith("/auth/")) {
-//             return chain.filter(exchange); // пропускаем без проверки
-//         }
-//
-//         String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
-//         String token = null;
-//
-//         // Если токен в Authorization: Bearer ...
-//         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-//             token = authHeader.substring(7); // убираем "Bearer "
-//         }
-//
-//         // Если запрос к SSE /notifications и токена нет в заголовке — пробуем из query-параметра
-//         if (token == null && exchange.getRequest().getURI().getPath().startsWith("/notifications")) {
-//             token = exchange.getRequest().getQueryParams().getFirst("token");
-//             System.out.println("SSE token: " + token);
-//         }
-//
-//         try {
-//            Claims claims = jwtService.validateToken(token);
-//             String username = claims.getSubject();
-//             String role = claims.get("role", String.class);
-//
-//             System.out.println("After Token Validation "+ username+ " "+role);
-//
-//             // Создаем Authentication
-//             List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
-//             Authentication auth = new UsernamePasswordAuthenticationToken(username, null, authorities);
-//
-//             // Пробрасываем userId и роль дальше в заголовках
-//            ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
-//                     .header("X-User-Id", username)
-//                     .header("X-User-Role", role)
-//                     .build();
-//
-//             ServerWebExchange mutatedExchange = exchange.mutate().request(mutatedRequest).build();
-//              return chain.filter(mutatedExchange)
-//                     .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
-//
-//         } catch (Exception e) {
-//             System.out.println(e.getLocalizedMessage());
-//
-//             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-//             return exchange.getResponse().setComplete();
-//         }
-//     }
-
-
 @Component
 public class JwtAuthFilter implements WebFilter {
 
@@ -85,49 +29,63 @@ public class JwtAuthFilter implements WebFilter {
         this.jwtService = jwtService;
     }
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(GatewayConfiguration.class);
+
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-
         String path = exchange.getRequest().getPath().toString();
-         if (path.startsWith("/auth/")) {
-             return chain.filter(exchange); // пропускаем без проверки
-         }
-
-         String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
-         String token = null;
-
-         // Если токен в Authorization: Bearer ...
-         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-             token = authHeader.substring(7); // убираем "Bearer "
-         }
-
-         // Если запрос к SSE /notifications и токена нет в заголовке — пробуем из query-параметра
-         if (token == null && exchange.getRequest().getURI().getPath().startsWith("/notifications")) {
-             token = exchange.getRequest().getQueryParams().getFirst("token");
-             System.out.println("SSE token: " + token);
-         }
-
-        try {
-
-            Claims claims = jwtService.validateToken(token);
-            Authentication auth = jwtService.getAuthentication(claims);
-
-            // формируем новые заголовки
-            ServerWebExchange mutatedExchange = exchange.mutate()
-                    .request(exchange.getRequest().mutate()
-                            .header("X-User-Id", claims.getSubject())
-                            .header("X-User-Role", claims.get("role", String.class))
-                            .build())
-                    .build();
-
-            return chain.filter(mutatedExchange)
-                    .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
-
-        } catch (Exception e) {
-            System.out.println(e.getLocalizedMessage());
+        // пропускаем без проверки
+        if (path.startsWith("/auth/")) {
+            return chain.filter(exchange);
+        }
+        //extractJwt сам разбирается, откуда взять токен
+        String token = extractJwt(exchange);
+        if (token == null) {
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
         }
+        try {
+            Claims claims = jwtService.validateToken(token);
+            Authentication auth = jwtService.getAuthentication(claims);
+
+            String role = auth.getAuthorities()
+                    .stream()
+                    .findFirst()
+                    .map(GrantedAuthority::getAuthority)
+                    .orElse(null);
+
+            // формируем новые заголовки
+            ServerWebExchange mutatedExchange = exchange
+                            .mutate().request(exchange.getRequest()
+                            .mutate().header("X-User-Id", claims.getSubject())
+                            .header("X-User-Role", role).build()).build();
+
+            return chain.filter(mutatedExchange).contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
+
+        }// production style
+        catch (JwtException | IllegalArgumentException e) {
+            LOGGER.warn("JWT validation failed: {}", e.getMessage());
+            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+            return exchange.getResponse().setComplete();
+        }
+    }
+
+    private String extractJwt(ServerWebExchange exchange) {
+        String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+        }
+
+        // Временная поддержка SSE
+        // TODO: Remove query-parameter JWT after migrating SSE to Authorization header.
+        // Query parameters leak into browser history, logs and reverse proxies.
+        if (exchange.getRequest().getPath().toString().startsWith("/notifications")) {
+            return exchange.getRequest().getQueryParams().getFirst("token");
+        }
+
+        return null;
     }
 }
 

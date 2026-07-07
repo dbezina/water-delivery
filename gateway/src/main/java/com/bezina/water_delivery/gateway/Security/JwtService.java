@@ -1,11 +1,14 @@
 package com.bezina.water_delivery.gateway.Security;
 
+import ch.qos.logback.classic.Logger;
+import com.bezina.water_delivery.gateway.config.GatewayConfiguration;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,9 +22,7 @@ import java.util.Collections;
 @Service
 public class JwtService {
 
-    public String getSecret() {
-        return secret;
-    }
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(JwtService.class);
 
     @Value("${jwt.secret}")
     private String secret;
@@ -30,42 +31,50 @@ public class JwtService {
         byte[] keyBytes = Decoders.BASE64.decode(secret);
         return Keys.hmacShaKeyFor(keyBytes);
     }
+//
+//    public boolean isTokenValid(String token) {
+//        try {
+//            Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);
+//
+//            return true;
+//        } catch (JwtException | IllegalArgumentException e) {
+//            return false;
+//        }
+//    }
+//
+//    public String extractRole(String token) {
+//        Claims claims = Jwts.parserBuilder().setSigningKey(getSigningKey()).build()
+//                .parseClaimsJws(token)
+//                .getBody();
+//
+//        LOGGER.debug("JWT role: {}", claims.get("role", String.class));
+//        return claims.get("role", String.class);
+//    }
 
-    public boolean isTokenValid(String token) {
-        try {
-            Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);
-
-            return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            return false;
-        }
-    }
-
-    public String extractRole(String token) {
-        Claims claims = Jwts.parserBuilder().setSigningKey(getSigningKey()).build()
+//   public Claims validateToken(String token) {
+//        try {
+//            return Jwts.parser()
+//                    .setSigningKey(getSigningKey())
+//                    .parseClaimsJws(token)
+//                    .getBody();
+//        }
+//        catch (SignatureException e) {
+//            throw new JwtException("Invalid JWT signature");
+//        }
+////        catch (Exception e) {
+////          //  System.out.println(e.getLocalizedMessage());
+////            LOGGER.error(e.getLocalizedMessage());
+////            throw new JwtException();
+////          //  throw new RuntimeException("Other Exception");
+////        }
+//
+//    }
+    public Claims validateToken(String token) {
+        return Jwts.parser()
+                .setSigningKey(getSigningKey())
                 .parseClaimsJws(token)
                 .getBody();
-        System.out.println("claims.get"+claims.get("role", String.class));
-        return claims.get("role", String.class);
     }
-
-   public Claims validateToken(String token) {
-        try {
-            return Jwts.parser()
-                    .setSigningKey(getSigningKey())
-                    .parseClaimsJws(token)
-                    .getBody();
-        }
-        catch (SignatureException e) {
-            throw new RuntimeException("Invalid JWT signature");
-        }
-        catch (Exception e) {
-            System.out.println(e.getLocalizedMessage());
-            throw new RuntimeException("Other Exception");
-        }
-
-    }
-
 
     public Authentication getAuthentication(Claims claims) {
         String username = claims.getSubject();
@@ -78,7 +87,7 @@ public class JwtService {
         Authentication auth = new UsernamePasswordAuthenticationToken(
                 username,
                 null,
-                Collections.singletonList(new SimpleGrantedAuthority(role))
+                Collections.singletonList(new SimpleGrantedAuthority(grantedRole))
         );
         return auth;
     }
